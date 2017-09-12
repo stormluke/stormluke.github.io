@@ -11,6 +11,8 @@ YCSB 包括两个部分：
 - YCSB 客户端，一个可以扩展的 workload 生成器
 - Core workloads，预先配置好的 workloads
 
+<!-- more -->
+
 ### 安装 YCSB
 
 下载 [YCSB 最新发行版](https://github.com/brianfrankcooper/YCSB/releases/latest)

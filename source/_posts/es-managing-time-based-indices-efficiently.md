@@ -17,6 +17,8 @@ url: es-managing-time-based-indices-efficiently
 
 在这篇文章中我将介绍新的”滚动模式“和用来实现它的 API 们，这个模式可以更加简单且高效地管理基于时间的索引。
 
+<!-- more -->
+
 ### 滚动模式
 
 滚动模式工作流程如下：
