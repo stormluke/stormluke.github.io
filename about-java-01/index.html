@@ -1,0 +1,64 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> Java 拾遗 01 - Colleciton 基础 · Preferences</title><meta name="description" content="Java 拾遗 01 - Colleciton 基础 - stormluke"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://stormluke.me/atom.xml" title="Preferences"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/sunchongsheng" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/pinggod" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">Java 拾遗 01 - Colleciton 基础</h1><div class="post-info">Aug 3, 2016</div><div class="post-content"><p>在 <a href="https://docs.oracle.com/javase/tutorial/collections/index.html" target="_blank" rel="external">Oracle 的文档</a>中提到，Collection 是：</p>
+<ul>
+<li>接口</li>
+<li>实现</li>
+<li>算法</li>
+</ul>
+<a id="more"></a>
+<p>的集合。Collection 的好处有：</p>
+<ul>
+<li>减少编程工作量</li>
+<li>提高程序速度和质量</li>
+<li>允许无关的API之间的互操作性</li>
+<li>让学习和使用新 API 更省力</li>
+<li>让设计新 API 更省力</li>
+<li>促进软件重用</li>
+</ul>
+<p>Java 中的基础 Collection 接口有：</p>
+<ul>
+<li><code>Set</code> / <code>SortedSet</code></li>
+<li><code>List</code><ul>
+<li><code>Queue</code> / <code>Deque</code>（双端队列，Double Ended QUEue）</li>
+</ul>
+</li>
+<li><code>Map</code> / <code>SortedMap</code></li>
+</ul>
+<p>Java 对这些接口提供了一些通用的实现：</p>
+<ul>
+<li><code>Set</code><ul>
+<li><code>HashSet</code>，Java 1.2，无序，散列</li>
+<li><code>TreeSet</code>，Java 1.2，升序，红黑树</li>
+<li><code>LinkedHashSet</code>，Java 1.4，插入序，散列</li>
+</ul>
+</li>
+<li><code>List</code><ul>
+<li><code>ArrayList</code>，Java 1.2，数组</li>
+<li><code>LinkedList</code>，Java 1.2，链表</li>
+<li><code>ArrayDeque</code>，Java 1.6，数组</li>
+</ul>
+</li>
+<li><code>Map</code><ul>
+<li><code>HashMap</code>，Java 1.2，无序，散列</li>
+<li><code>TreeMap</code>，Java 1.2，升序，红黑树</li>
+<li><code>LinkedHashMap</code>，Java 1.4，插入序，散列</li>
+</ul>
+</li>
+</ul>
+<p>它们之间的关系如下：</p>
+<p><img src="http://ww3.sinaimg.cn/large/6ad06ebbgw1f6ghss8lpvj20z00zejw5.jpg" alt=""></p>
+<p>值得注意的是 <code>Map</code> 不遵循 <code>Collection</code>，<code>Set</code> 的实现依赖于 <code>Map</code>。这些 Collection 均没有考虑线程安全。</p>
+<p>某些面试题中问到 <code>Vector</code> 和 <code>ArrayList</code> 的区别，主要有以下几点：</p>
+<ul>
+<li><code>Vector</code> 在 Java 1.0 加入，<code>ArrayList</code> 在 Java 1.2 加入</li>
+<li><code>Vector</code> 线程安全（由 <code>synchronized</code> 实现），<code>ArrayList</code> 没考虑线程安全，但有专门的易互转的 <code>CopyOnWriteArrayList</code> 等来应对多线程应用</li>
+<li><code>Vector</code> 每次扩容一倍，<code>ArrayList</code> 扩容 50%</li>
+<li>在<a href="https://dzone.com/articles/java-collection-performance" target="_blank" rel="external">这个 benchmark</a> 中 <code>Vector</code> 比 <code>ArrayList</code> 略慢</li>
+</ul>
+<p>所以 <code>Vector</code> 一般存在于面试题中。同样，<code>Hashtable</code>、<code>Dictionary</code>、<code>BitSet</code>、<code>Stack</code>、<code>Properties</code> 这些类也都是遗留的。</p>
+<p>关于不同 Collection 的算法实现效率，可以参考 <a href="http://bigocheatsheet.com/" target="_blank" rel="external">Big-O Cheat Sheet（Java 无关）</a>／<a href="http://stackoverflow.com/a/559862" target="_blank" rel="external">big-o-summary-for-java-collections-framework-implementations（Java 相关）</a>。</p>
+<p>更多关于 Collection 的参考：</p>
+<ul>
+<li><a href="http://docs.oracle.com/javase/6/docs/technotes/guides/collections/overview.html" target="_blank" rel="external">Collections Framework Overview</a></li>
+<li><a href="http://docs.oracle.com/javase/6/docs/technotes/guides/collections/reference.html" target="_blank" rel="external">Annotated Outline of Collections Framework</a></li>
+</ul>
+</div></article></div></main><footer><div class="paginator"><a href="/about-java-02/" class="prev">PREV</a><a href="/wwdc-2016-session-419-note/" class="next">NEXT</a></div><div class="copyright"><p>© 2015 - 2018 <a href="http://stormluke.me">stormluke</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> 大数据的哈希学习：入门教程 － 引子 · Preferences</title><meta name="description" content="大数据的哈希学习：入门教程 － 引子 - stormluke"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://stormluke.me/atom.xml" title="Preferences"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/sunchongsheng" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/pinggod" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">大数据的哈希学习：入门教程 － 引子</h1><div class="post-info">May 8, 2016</div><div class="post-content"><p>翻译自 <a href="http://cs.nju.edu.cn/lwj/slides/L2H.pdf" target="_blank" rel="external">Learning to Hash for Big Data: A Tutorial</a>。</p>
+<h3 id="引子"><a href="#引子" class="headerlink" title="引子"></a>引子</h3><h4 id="大数据中的最近邻搜索"><a href="#大数据中的最近邻搜索" class="headerlink" title="大数据中的最近邻搜索"></a>大数据中的最近邻搜索</h4><p>最近邻搜索（Nearest Neighbor Search）：给定查询点 q，返回数据库中距离 q 最近（最相似）的点集。</p>
+<ul>
+<li>Facebook：7.5 亿用户</li>
+<li>Flickr：6 千万照片</li>
+<li>Wal-Mart: 每天 2.67 亿商品；4PB 数据仓库</li>
+<li><a href="https://zh.wikipedia.org/wiki/%E5%8F%B2%E9%9A%86%E6%95%B8%E4%BD%8D%E5%B7%A1%E5%A4%A9" target="_blank" rel="external">Sloan Digital Sky Survery</a>：新墨西哥州望远镜每天获取 200GB 图像数据</li>
+</ul>
+<a id="more"></a>
+<p>大数据中的最近邻搜索挑战：</p>
+<ul>
+<li>维数灾难</li>
+<li>存储</li>
+<li>查询速度</li>
+</ul>
+<h4 id="Similarity-Preserving-Hashing（相似保留哈希）"><a href="#Similarity-Preserving-Hashing（相似保留哈希）" class="headerlink" title="Similarity Preserving Hashing（相似保留哈希）"></a>Similarity Preserving Hashing（相似保留哈希）</h4><p><img src="http://ww1.sinaimg.cn/large/6ad06ebbjw1f60tbwescjj21gg0w6dug.jpg" alt=""></p>
+<p>让无关图像对应的哈希编码尽可能不同，让相似图像的哈希编码尽可能相同。</p>
+<p><img src="http://ww4.sinaimg.cn/large/6ad06ebbjw1f60tbcewrvj211q0uun0o.jpg" alt=""></p>
+<p>存储空间需求减少。</p>
+<p>使用哈希编码来建立索引，可以达到常数或次线性查询时间复杂度。</p>
+<p>某些情况下线性时间的全搜索也可以接受，因为二进制表示下的距离计算消耗很低。</p>
+<h4 id="哈希函数学习的两个阶段"><a href="#哈希函数学习的两个阶段" class="headerlink" title="哈希函数学习的两个阶段"></a>哈希函数学习的两个阶段</h4><ul>
+<li>第一类<ul>
+<li>投影阶段（Projection Stage）（降维）<ul>
+<li>用实值投影函数投影</li>
+<li>给定点 x，每个投影维度 i 都和一个实值投影函数相关联 fi(x)（比如 fi(x)=Wi^T*x</li>
+</ul>
+</li>
+<li>量化阶段（Quantization Stage）<ul>
+<li>将实数转化为二进制（Turn real into binary）</li>
+<li>度量学习（metric learning）和哈希学习（learning to hash）的本质区别</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>第二类<ul>
+<li>二进制编码学习阶段</li>
+<li>哈希函数学习阶段</li>
+</ul>
+</li>
+</ul>
+<h4 id="数据无关方法"><a href="#数据无关方法" class="headerlink" title="数据无关方法"></a>数据无关方法</h4><p>哈希函数的定义和训练数据集无关。</p>
+<ul>
+<li>Locality-sensitive hashing (LSH) 位置敏感哈希 (Gionis et al., 1999; Andoni and Indyk, 2008)<ul>
+<li>和它的扩展 (Datar et al., 2004; Kulis and Grauman, 2009; Kulis et al., 2009)</li>
+</ul>
+</li>
+<li>SIKH: 偏移不变核函数哈希（Shift invariant kernel hashing）(SIKH) (Raginsky and Lazebnik, 2009)</li>
+<li>MinHash (Broder et al., 1998)<ul>
+<li>和它的扩展 (Li and K ̈onig, 2011)</li>
+</ul>
+</li>
+</ul>
+<p>这些方法的哈希函数使用了<strong>随机投影</strong>或者是<strong>人工构造</strong>的，所以不属于哈希学习。</p>
+<h4 id="数据相关方法"><a href="#数据相关方法" class="headerlink" title="数据相关方法"></a>数据相关方法</h4><p>哈希函数是从给定的训练数据集中学习得到。</p>
+<p>和数据无关方法相比，数据相关方法（即哈希学习）可以在更短的二进制编码上获得相近甚至更好的精确度。</p>
+<p>开创性论文：(Salakhutdinov and Hinton, 2007, 2009; Torralba et al., 2008; Weiss et al., 2008)</p>
+<p>两个种类：</p>
+<ul>
+<li>单模态<ul>
+<li>监督式方法：给定一些监督的（语义）信息，例如 pairwise 标签 s_ij, pointwise 标签 yi 或者 triplet 标签 (xi, xj, xk)</li>
+<li>非监督式方法</li>
+</ul>
+</li>
+<li>多模态<ul>
+<li>监督式方法</li>
+<li>非监督式方法</li>
+</ul>
+</li>
+</ul>
+<h4 id="单模态非监督方法"><a href="#单模态非监督方法" class="headerlink" title="单模态非监督方法"></a>单模态非监督方法</h4><p>没有指示训练点类别的标签。</p>
+<ul>
+<li>PCAH：主成分分析</li>
+<li>SH：数据相似度图中计算出的<a href="https://zh.wikipedia.org/wiki/%E6%9C%AC%E5%BE%B5%E5%87%BD%E6%95%B8" target="_blank" rel="external">本征函数（eigenfunctions）</a> (Weiss et al., 2008)</li>
+<li>AGH：基于锚图（anchor graph）的哈希 (Liu et al., 2011)</li>
+<li>ITQ：用<a href="https://zh.wikipedia.org/wiki/%E6%97%8B%E8%BD%AC%E7%9F%A9%E9%98%B5" target="_blank" rel="external">正交旋转矩阵（orthogonal rotation matrix）</a>来改进由 PCA 学习到的初始影射矩阵 (Gong and Lazebnik, 2011)</li>
+<li>IsoHash：使用<a href="https://zh.wikipedia.org/wiki/%E6%97%8B%E8%BD%AC%E7%9F%A9%E9%98%B5" target="_blank" rel="external">正交旋转矩阵（orthogonal rotation matrix）</a>来让不同方向的变化<a href="https://zh.wikipedia.org/wiki/%E5%90%84%E5%90%91%E5%90%8C%E6%80%A7" target="_blank" rel="external">各向同性（isotropic）</a>（相等） (Kong and Li, 2012b)</li>
+<li>DGH：直接学习离散二进制编码 (Liu et al., 2014)</li>
+<li>SGH: 使用特征变换的可扩展的图哈希 (Jiang and Li, 2015)</li>
+</ul>
+<h4 id="单模态监督（半监督）方法"><a href="#单模态监督（半监督）方法" class="headerlink" title="单模态监督（半监督）方法"></a>单模态监督（半监督）方法</h4><p>具有类标签或者配对（pairwise）约束。</p>
+<ul>
+<li>SSH (SPLH)：半监督哈希，同时利用有标签和无标签数据 (Wang et al., 2010a,b)</li>
+<li>MLH：基于隐式结构（latent structural）SVM 框架的最小化损失哈希 (Norouzi and Fleet, 2011)</li>
+<li>LDAHash：基于线性区分分析（Linear discriminant analysis）的哈希 (Strecha et al., 2012)</li>
+<li>KSH：基于核函数（Kernel）的监督式哈希 (Liu et al., 2012)</li>
+<li>LFH：隐含因子模型的监督式哈希 (Zhang et al., 2014)</li>
+<li>FastH：使用图割和决策树的监督式哈希 (Lin et al., 2014)</li>
+<li>SDH：使用逐点（pointwise）标签的监督式离散哈希 (Shen et al., 2015)</li>
+<li>COSDISH：使用 pairwise 监督的可扩展的离散哈希</li>
+</ul>
+<h4 id="基于排序的方法"><a href="#基于排序的方法" class="headerlink" title="基于排序的方法"></a>基于排序的方法</h4><p>监督信息是排序标签，例如三元组 (xi, xj, xk)。</p>
+<ul>
+<li>HDML：汉明距离度量学习（metric learning）(Norouzi et al., 2012)</li>
+<li>OPH：顺序保留哈希，近似最近邻搜索 (Wang et al., 2013b)</li>
+<li>RSH：用 listwise 监督式学习哈希编码 (Wang et al., 2013a)</li>
+<li>RPH：排序保留哈希，快速相似度搜索 (Wang et al., 2015)</li>
+</ul>
+<h4 id="多媒体方法"><a href="#多媒体方法" class="headerlink" title="多媒体方法"></a>多媒体方法</h4><ul>
+<li>多来源哈希（Multi-Source）</li>
+<li>跨媒体哈希（Cross-Modal Hashing）</li>
+</ul>
+<h5 id="多来源方法"><a href="#多来源方法" class="headerlink" title="多来源方法"></a>多来源方法</h5><ul>
+<li>目标是利用辅助视图（auxiliary views）来学习比单模态哈希更好的编码</li>
+<li>假设查询提供了所有视图</li>
+<li>MFH：多特征哈希 (Song et al., 2011)</li>
+<li>CH：复合哈希 (Zhang et al., 2011)</li>
+</ul>
+<h5 id="跨媒体方法"><a href="#跨媒体方法" class="headerlink" title="跨媒体方法"></a>跨媒体方法</h5><p>给定包含图片或文字的查询，返回相关的图片或文字。</p>
+<ul>
+<li>CVH：跨视图哈希 (Kumar and Udupa, 2011)</li>
+<li>MLBE：多模态隐含二进制嵌入 (Zhen and Yeung, 2012a)</li>
+<li>CRH：同时正则化（Co-regularized）哈希 (Zhen and Yeung, 2012b)</li>
+<li>IMH：媒体间哈希（Inter-media hashing）(Song et al., 2013)</li>
+<li>RaHH：关系感知异构（Relation-aware heterogeneous）哈希 (Ou et al., 2013)</li>
+<li>SCM：语义相关最大化（Semantic correlation maximization）(Zhang and Li, 2014)</li>
+<li>CMFH：集体矩阵分解（Collective matrix factorization）哈希 (Ding et al., 2014)</li>
+<li>QCH：量化相关哈希（Quantized correlation hashing）(Wu et al., 2015)</li>
+<li>SePH：语义保留哈希 (Lin et al., 2015b)</li>
+</ul>
+<h4 id="深度哈希"><a href="#深度哈希" class="headerlink" title="深度哈希"></a>深度哈希</h4><p>使用深度学习的哈希。</p>
+<ul>
+<li>CNNH：通过图片表达学习的监督式哈希 (Xia et al., 2014)</li>
+<li>NINH：用深度神经网络同时特征学习和哈希编码 (Lai et al., 2015)</li>
+<li>DSRH：基于深度语义排序的哈希 (Zhao et al., 2015)</li>
+<li>DRSCH：位可扩展（Bit-scalable）深度哈希 (Zhang et al., 2015)</li>
+<li>DH：深度哈希，压缩二进制编码学习 (Liong et al., 2015)</li>
+<li>二进制编码学习深度哈希 (Lin et al., 2015a)</li>
+<li>DPSH：基于特征学习的使用 pairwise 标签的深度监督哈希 (Li et al., 2015)</li>
+</ul>
+<h4 id="量化"><a href="#量化" class="headerlink" title="量化"></a>量化</h4><p>量化阶段和投影阶段一样重要。</p>
+<ul>
+<li>DBQ：双位（Double-bit）量化 (Kong and Li, 2012a)</li>
+<li>MQ：曼哈顿（Manhattan）量化 (Kong et al., 2012)</li>
+<li>VBQ：可变位（Variable bit quantization）量化 (Moran et al., 2013)</li>
+</ul>
+</div></article></div></main><footer><div class="paginator"><a href="/things-2016/" class="prev">PREV</a><a href="/reactive-cocoa-readme/" class="next">NEXT</a></div><div class="copyright"><p>© 2015 - 2018 <a href="http://stormluke.me">stormluke</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

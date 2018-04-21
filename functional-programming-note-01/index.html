@@ -1,0 +1,101 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> 函数式编程笔记 01 · Preferences</title><meta name="description" content="函数式编程笔记 01 - stormluke"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://stormluke.me/atom.xml" title="Preferences"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/sunchongsheng" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/pinggod" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">函数式编程笔记 01</h1><div class="post-info">Jun 25, 2013</div><div class="post-content"><p>Cousera 上 <a href="https://class.coursera.org/progfun-002/class" target="_blank" rel="external">Functional Programming Prinples in Scala</a> 的笔记。</p>
+<h3 id="编程范式"><a href="#编程范式" class="headerlink" title="编程范式"></a>编程范式</h3><p>范式描述了某些科学学科中独特的概念或者思考模式。</p>
+<p>主要的编程范式：</p>
+<ul>
+<li>命令式编程</li>
+<li>函数式编程</li>
+<li>逻辑式编程</li>
+</ul>
+<p>与它正交：</p>
+<ul>
+<li>面向对象编程</li>
+</ul>
+<a id="more"></a>
+<h3 id="命令式编程"><a href="#命令式编程" class="headerlink" title="命令式编程"></a>命令式编程</h3><ul>
+<li>修改可变变量</li>
+<li>赋值</li>
+<li>诸如if-then-else、loops、break、continue、return等的控制结构</li>
+</ul>
+<p>简单来理解，命令式编程就是Von Neumann计算机上的指令序列。</p>
+<h3 id="命令式的程序和计算机"><a href="#命令式的程序和计算机" class="headerlink" title="命令式的程序和计算机"></a>命令式的程序和计算机</h3><ul>
+<li>可变变量 ≈ 内存单元</li>
+<li>变量解引用 ≈ load指令</li>
+<li>变量赋值 ≈ store指令</li>
+<li>控制结构 ≈ jump指令</li>
+</ul>
+<p>这在程序规模变大时会出现问题。怎样才能避免逐字的翻译式的编程？</p>
+<p>John Backus 1978年在Turing Award上的讲稿：<a href="http://www.thocp.net/biographies/papers/backus_turingaward_lecture.pdf" target="_blank" rel="external"><em>Can Programming be Liberated from the von. Neumann Style?</em></a></p>
+<p>Jone Backus是第一个高级语言Fortran的发明者。</p>
+<h3 id="规模增大"><a href="#规模增大" class="headerlink" title="规模增大"></a>规模增大</h3><p>纯命令式编程被Von Neumann所限制：</p>
+<blockquote>
+<p><em>“One tends to conceptualize data structures word-by-word”</em></p>
+</blockquote>
+<p>需要其他的方式来定义类似于集合、多项式、几何图形、串、文档等这些高级的抽象。</p>
+<p>理想的方法是提出集合、形状、串等的定理。</p>
+<h3 id="什么是定理"><a href="#什么是定理" class="headerlink" title="什么是定理"></a>什么是定理</h3><p>定理包括</p>
+<ul>
+<li>一个或多个数据类型</li>
+<li>这些类型上的运算符</li>
+<li>值和运算符之间关系的规则</li>
+</ul>
+<p>定理并不描述变化！</p>
+<h3 id="定理不包括变化"><a href="#定理不包括变化" class="headerlink" title="定理不包括变化"></a>定理不包括变化</h3><p>一个定义两个多项式的和的例子：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">(a * x + b) + (c * x + d) = (x + c) * x + (b + d)</div></pre></td></tr></table></figure>
+<p>它并没有定义一个在改变系数的同时保持多项式相等的运算符！</p>
+<p>但是在命令式编程中却可以这样写：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Polynomial</span> </span>&#123; double[] coefficient; &#125;</div><div class="line"><span class="type">Polynomial</span> p = …;</div><div class="line">p.coefficient[<span class="number">0</span>] = <span class="number">42</span>;</div></pre></td></tr></table></figure>
+<p>（系数<code>coefficient[0]</code>变了但多项式<code>p</code>没变）</p>
+<p>另外一个例子是字符串中的<code>++</code>运算符：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">(a ++ b) ++ c = a ++ (b ++ c)</div></pre></td></tr></table></figure>
+<p>它并没有定义一个在改变序列元素的同时保持序列相等的运算符！</p>
+<p>Java在这儿做的不错……它的String是不可变的。</p>
+<h3 id="对编程的影响"><a href="#对编程的影响" class="headerlink" title="对编程的影响"></a>对编程的影响</h3><p>如果想根据它们的数学定理来实现高级概念，那就没有变化的地方。</p>
+<ul>
+<li>数学不承认它</li>
+<li>变化会毁掉定理中有用的规律</li>
+</ul>
+<p>因此</p>
+<ul>
+<li>用函数来表达运算符的定理</li>
+<li>避免变化</li>
+<li>有了一个强大的方法来抽象和构造函数</li>
+</ul>
+<h3 id="函数式编程"><a href="#函数式编程" class="headerlink" title="函数式编程"></a>函数式编程</h3><ul>
+<li>在狭义上，函数式编程意味着没有可变变量，赋值，循环和其他的命令式控制结构</li>
+<li>在广义上，函数式编程意味着专注于函数</li>
+<li>特别是，函数可以是能被产生、消耗和构造的值</li>
+<li>这在函数式语言中都特别简单</li>
+</ul>
+<h3 id="函数式编程语言"><a href="#函数式编程语言" class="headerlink" title="函数式编程语言"></a>函数式编程语言</h3><p>函数是一等公民。</p>
+<ul>
+<li>在任何地方都可以被定义，包括在另一个函数内部</li>
+<li>像其他值一样，可以作为参数传递给其他函数，也可以作为值返回</li>
+<li>像其他值一样，有一套构造函数的运算符</li>
+</ul>
+<p>狭义上的函数式编程语言：</p>
+<ul>
+<li>Pure Lisp, XSLT, XPath, XQuery, FP</li>
+<li>Haskell (without I/O Monad or UnsafPerformIO)</li>
+</ul>
+<p>广义上的函数式编程语言：</p>
+<ul>
+<li>Lisp, Scheme, Racket, Clojure</li>
+<li>SML, Ocaml, F#</li>
+<li>Haskell (full language)</li>
+<li>Scala</li>
+<li>Smalltalk, Ruby</li>
+</ul>
+<h3 id="函数式编程语言历史"><a href="#函数式编程语言历史" class="headerlink" title="函数式编程语言历史"></a>函数式编程语言历史</h3><ul>
+<li>1959 - Lisp</li>
+<li>1975-77 - ML, FP, Scheme</li>
+<li>1978 - Smalltalk</li>
+<li>1986 - Standard ML</li>
+<li>1990 - Haskell, Erlang</li>
+<li>1999 - XSLT</li>
+<li>2000 - OCaml</li>
+<li>2003 - scala, XQuery</li>
+<li>2005 - F#</li>
+<li>2007 - Clojure</li>
+</ul>
+<h3 id="资源"><a href="#资源" class="headerlink" title="资源"></a>资源</h3><p><a href="https://class.coursera.org/progfun-002/wiki/view?page=LearningResources" target="_blank" rel="external">Leaning Resources</a></p>
+</div></article></div></main><footer><div class="paginator"><a href="/functional-programming-note-02/" class="prev">PREV</a><a href="/why-meteor-rocks/" class="next">NEXT</a></div><div class="copyright"><p>© 2015 - 2018 <a href="http://stormluke.me">stormluke</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

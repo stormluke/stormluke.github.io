@@ -1,0 +1,397 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> 小阴谋家——一遍又一遍 · Preferences</title><meta name="description" content="小阴谋家——一遍又一遍 - stormluke"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://stormluke.me/atom.xml" title="Preferences"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/sunchongsheng" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/pinggod" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">小阴谋家——一遍又一遍</h1><div class="post-info">Feb 12, 2015</div><div class="post-content"><p>翻译自 <a href="http://kysmykseka.net/koti/wizardry/Programming/Lisp/Scheme/The%20Little%20Schemer%204th%20Ed.pdf" target="_blank" rel="external"><em>The Little Schemer 4th Edition Ch9 - …and Again, and Again, and Again, …</em></a>。</p>
+<p>（这篇文章提到了 Y combinator。）</p>
+<a id="more"></a>
+<p>A：你想吃<em>鱼子酱</em>吗？</p>
+<p>B：那我们必须去<em>寻找</em>它。</p>
+<p>A：当 <code>a</code> 是 <code>caviar</code>，<code>lat</code> 是 <code>(6 2 4 caviar 5 7 3)</code> 时 <code>(looking a lat)</code> 的结果是什么？</p>
+<p>B：<code>#t</code>，很明显 <code>caviar</code> 在 <code>lat</code> 中。</p>
+<p>A：当 <code>a</code> 是 <code>caviar</code>，<code>lat</code> 是 <code>(6 2 grits caviar 5 7 3)</code> 时 <code>(looking a lat)</code> 呢？</p>
+<p>B：<code>#f</code>。</p>
+<p>A：和你想的不一样？</p>
+<p>B：是啊，<code>caviar</code> 仍在 <code>lat</code> 中。</p>
+<p>A：确实，但 <code>lat</code> 的第一个数字是什么？</p>
+<p>B：6。</p>
+<p>A：那 <code>lat</code> 的第六个元素是什么？</p>
+<p>B：7。</p>
+<p>A：第七个元素呢？</p>
+<p>B：3。</p>
+<p>A：所以 <code>looking</code> 显然找不到 <code>caviar</code>。</p>
+<p>B：确实，因为第三个元素是 <code>grits</code>，和 <code>caviar</code> 一点也不像。</p>
+<p>A：这是 <code>looking</code></p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">(<span class="name">define</span> looking</div><div class="line">  (<span class="name">lambda</span> (<span class="name">a</span> lat)</div><div class="line">    (<span class="name">keep-looking</span> a (<span class="name">pick</span> <span class="number">1</span> lat) lat)))</div></pre></td></tr></table></figure>
+<p>写出 <code>keep-looking</code>。</p>
+<p>B：我们不期望你知道答案。</p>
+<p>A：当 <code>a</code> 是 <code>caviar</code>，<code>lat</code> 是 <code>(6 2 4 caviar 5 7 3)</code> 时 <code>(looking a lat)</code> 呢？</p>
+<p>B：<code>#t</code>，因为 <code>(keep-looking a 6 lat)</code> 和 <code>(keep-looking a (pick 1 lat) lat)</code> 结果相同。</p>
+<p>A：当 <code>lat</code> 是 <code>(6 2 4 caviar 5 7 3)</code> 时 <code>(pick 6 lat)</code> 的结果是什么？</p>
+<p>B：7。</p>
+<p>A：那我们该怎么办？</p>
+<p>B：<code>(keep-looking a 7 lat)</code>，其中 <code>a</code> 是 <code>caviar</code>，<code>lat</code> 是 <code>(6 2 4 caviar 5 7 3)</code> 。</p>
+<p>A：当 <code>lat</code> 是 <code>(6 2 4 caviar 5 7 3)</code> 时 <code>(pick 7 lat)</code> 的结果是什么？</p>
+<p>B：3。</p>
+<p>A：那么当 <code>a</code> 是 <code>caviar</code>，<code>lat</code> 是 <code>(6 2 4 caviar 5 7 3)</code> 时 <code>(keep-looking a 3 lat)</code> 的结果是什么？</p>
+<p>B：和 <code>(keep-looking a 4 lat)</code> 一样。</p>
+<p>A：那是？</p>
+<p>B：<code>#t</code>。</p>
+<p>A：写出 <code>keep-looking</code>。</p>
+<p>B：</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">(<span class="name">define</span> keep-looking</div><div class="line">  (<span class="name">lambda</span> (<span class="name">a</span> sorn lat)</div><div class="line">    (<span class="name">cond</span></div><div class="line">      ((<span class="name">number</span>? sorn)</div><div class="line">       (<span class="name">keep-looking</span> a (<span class="name">pick</span> sorn lat) lat))</div><div class="line">      (<span class="name">else</span> (<span class="name">eq</span>? sorn a)))))</div></pre></td></tr></table></figure>
+<p>A：你能猜出 <code>sorn</code> 代表啥吗？</p>
+<p>B：符号或者数字。</p>
+<p>A：<code>keep-looking</code> 有什么不寻常的地方？</p>
+<p>B：它在 <code>lat</code> 某一部分上不递归。</p>
+<p>A：我们把这叫做“非原始”递归（”unnatural” recursion）。</p>
+<p>B：这确实很反常。</p>
+<p>A：<code>keep-looking</code> 离其目标越来越近吗？</p>
+<p>B：是的，从目前所有证据看来。</p>
+<p>A：它始终和目标越来越近吗？</p>
+<p>B：有时列表会既不包含 <code>caviar</code> 也不包含 <code>grits</code>。</p>
+<p>A：嗯对。列表可能是元组（仅包含数字）。</p>
+<p>B：嗯，如果我们在 <code>(7 2 4 7 5 6 3)</code> 上开始 <code>looking</code>，我们将永远不会停下来。</p>
+<p>A：当 <code>a</code> 是 <code>caviar</code>，<code>lat</code> 是 <code>(7 1 2 caviar 5 6 3)</code> 时。<code>(looking a lat)</code> 的结果是什么？</p>
+<p>B：这很奇怪！</p>
+<p>A：确实奇怪。发生了啥？</p>
+<p>B：我们不停地查询查询查询……</p>
+<p>A：如同 <code>looking</code> 的函数叫做<a href="http://en.wikipedia.org/wiki/Partial_function" target="_blank" rel="external">偏函数（缺值函数 / partial function）</a>。你觉得我们到目前为止看到的函数叫什么？</p>
+<p>B：它们叫做全函数（total function）。</p>
+<p>A：你能定义一个给定某些参数时不能到达其目标的简短函数吗？</p>
+<p>B：</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">(<span class="name">define</span> eternity</div><div class="line">  (<span class="name">lambda</span> (<span class="name">x</span>)</div><div class="line">    (<span class="name">eternity</span> x)))</div></pre></td></tr></table></figure>
+<p>A：有多少参数能让 <code>eternity</code> 到达其目标？</p>
+<p>B：一个都没，这可能是最反常的递归了。</p>
+<p>A：<code>eternity</code> 是偏的吗？</p>
+<p>B：这是最偏的函数了。</p>
+<p>A：当 <code>x</code> 是 <code>((a b) c)</code> 时 <code>(shift x)</code> 的结果是什么？</p>
+<p>B：<code>(a (b c))</code>。</p>
+<p>A：当 <code>x</code> 是 <code>((a b) (c d))</code> 时 <code>(shift x)</code> 的结果是什么？</p>
+<p>B：<code>(a (b (c d)))</code>。</p>
+<p>A：定义 <code>shift</code>。</p>
+<p>B：这是平凡的；它甚至不递归！</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">(<span class="name">define</span> shift</div><div class="line">  (<span class="name">lambda</span> (<span class="name">pair</span>)</div><div class="line">    (<span class="name">build</span> (<span class="name">first</span> (<span class="name">first</span> pair))</div><div class="line">      (<span class="name">build</span> (<span class="name">second</span> (<span class="name">first</span> pair))</div><div class="line">        (<span class="name">second</span> pair)))))</div></pre></td></tr></table></figure>
+<p>A：描述 <code>shift</code> 做了啥。</p>
+<p>B：这是我们的陈述：“函数 <code>shift</code> 接受一个偶对，此偶对的第一部分也是一个偶对。该函数构造一个偶对，这个偶对是由参数偶对的第一部分的偶对的第二部分挪动到参数偶对的第二部分构成的。”</p>
+<p>A：现在看看这个函数：</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">(<span class="name">define</span> align</div><div class="line">  (<span class="name">lambda</span> (<span class="name">pora</span>)</div><div class="line">    (<span class="name">cond</span></div><div class="line">      ((<span class="name">atom</span>? pora) pora)</div><div class="line">      ((<span class="name">a-pair</span>? (<span class="name">first</span> pora))</div><div class="line">       (<span class="name">align</span> (<span class="name">shift</span> pora)))</div><div class="line">      (<span class="name">else</span> (<span class="name">build</span> (<span class="name">first</span> pora)</div><div class="line">              (<span class="name">align</span> (<span class="name">second</span> pora)))))))</div></pre></td></tr></table></figure>
+<p>它和 <code>keep-looking</code> 有什么相似之处？</p>
+<p>B：两个函数都改变了自身的参数以作递归用，但两个函数都不保证能到达其目标。</p>
+<p>A：为什么我们不能保证 <code>align</code> 会有进展？</p>
+<p>B：在 <code>cond</code> 的第二行 <code>shift</code> 为 <code>align</code> 创建的参数并不是原参数的一部分。</p>
+<p>A：这违反了哪条戒律？</p>
+<p>B：第七戒。</p>
+<blockquote>
+<p>第七戒<br>在子部分上的递归有同样的本质：<br>在列表的子列表上<br>在算术表达式的子表达式上</p>
+</blockquote>
+<p>A：新参数至少比原参数更小吗？</p>
+<p>B：看起来不像。</p>
+<p>A：为啥呢？</p>
+<p>B：<code>shift</code> 函数仅仅重新排列了它得到的部分。</p>
+<p>A：然后？</p>
+<p>B：<code>shift</code> 的参数和结果有一样的原子个数。</p>
+<p>A：你能写一个计算 <code>align</code> 参数中原子个数的函数吗？</p>
+<p>B：没问题：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">(<span class="name">define</span> length *</div><div class="line">  (lambda (pora)</div><div class="line">    (cond</div><div class="line">      ((atom? pora) 1)</div><div class="line">      (else</div><div class="line">        (+ (length* (<span class="name">first</span> pora))</div><div class="line">           (length* (second pora)))))))</div></pre></td></tr></table></figure>
+<p>A：<code>align</code> 是偏函数吗？</p>
+<p>B：我们还不清楚。可能有某些参数使其一直做对齐操作。</p>
+<p>A：<code>align</code> 的参数和其递归过程还有其他改变吗？</p>
+<p>B：有的。偶对的第一部分变得更简单，同时第二部分变得更复杂。</p>
+<p>A：第一部分怎么变得简单了？</p>
+<p>B：它只是原来的第一部分。</p>
+<p>A：这不就是说 <code>length*</code> 不能确定参数的长度？你能找出一个更好的函数吗？</p>
+<p>B：更好的函数应该在第一部分上更加小心。</p>
+<p>A：在第一部分上我们应该多小心？</p>
+<p>B：至少两倍。</p>
+<p>A：你是不是说类似于 <code>weight*</code> 这样的</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">(<span class="name">define</span> weight*</div><div class="line">  (<span class="name">lambda</span> (<span class="name">pora</span>)</div><div class="line">   (<span class="name">cond</span></div><div class="line">     ((<span class="name">atom</span>? pora) <span class="number">1</span>)</div><div class="line">     (<span class="name">else</span></div><div class="line">       (<span class="name">+</span> (<span class="name">*</span> (<span class="name">weight*</span> (<span class="name">first</span> pora)) <span class="number">2</span>)</div><div class="line">          (<span class="name">weight*</span> (<span class="name">second</span> pora))))))</div></pre></td></tr></table></figure>
+<p>B：看起来是。</p>
+<p>A：当 <code>x</code> 是 <code>((a b) c)</code> 时 <code>(weight* x)</code> 的结果是什么？</p>
+<p>B：7。</p>
+<p>A：当 <code>x</code> 是 <code>(a (b c))</code> 时 <code>(weight* x)</code> 的结果是什么？</p>
+<p>B：5。</p>
+<p>A：这是不是意味着参数变简单了？</p>
+<p>B：是的，<code>align</code> 参数的 <code>weight*</code> 值连续地变小。</p>
+<p>A：<code>align</code> 是偏函数吗？</p>
+<p>B：不，它对每个参数都能产生值。</p>
+<p>A：这是 <code>shuffle</code>，它类似于 <code>align</code> 但用第七章中的 <code>revpair</code> 替换了 <code>shift</code>：</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">(<span class="name">define</span> shuffle</div><div class="line">  (<span class="name">lambda</span> (<span class="name">pora</span>)</div><div class="line">    (<span class="name">cond</span></div><div class="line">      ((<span class="name">atom</span>? pora) pora)</div><div class="line">      ((<span class="name">a-pair</span>? (<span class="name">first</span> pora))</div><div class="line">       (<span class="name">shuffle</span> (<span class="name">revpair</span> pora)))</div><div class="line">      (<span class="name">else</span> (<span class="name">build</span> (<span class="name">first</span> pora)</div><div class="line">              (<span class="name">shuffle</span> (<span class="name">second</span> pora)))))))</div></pre></td></tr></table></figure>
+<p>B：当偶对的第一部分是偶对时 <code>shuffle</code> 和 <code>revpair</code> 交换这两个部分。</p>
+<p>A：这说明 <code>shuffle</code> 是完全的？</p>
+<p>B：我们不知道。</p>
+<p>A：让我们试试。当 <code>x</code> 是 <code>(a (b c))</code> 时 <code>(shuffle x)</code> 的结果是什么？</p>
+<p>B：<code>(a (b c))</code>。</p>
+<p>A：当 <code>x</code> 是 <code>(a b)</code> 时 <code>(shuffle x)</code> 呢？</p>
+<p>B：<code>(a b)</code>。</p>
+<p>A：好，让我们来点有趣的。当 <code>x</code> 是 <code>((a b) (c d))</code> 时 <code>(shuffle x)</code> 的结果是什么？</p>
+<p>B：要确定结果，我们需要算出 <code>(shuffle (revpair pora))</code> 的值是什么。其中 <code>pora</code> 是 <code>((a b) (c d))</code>。</p>
+<p>A：那我们该如何做呢？</p>
+<p>B：我们应该确定 <code>(shuffle pora)</code> 的值。其中 <code>pora</code> 是 <code>((c d) (a b))</code>。</p>
+<p>A：这不就是说我们需要知道当 <code>(revpair pora)</code> 是 <code>((a b) (c d))</code> 时 <code>(shuffle (revpair pora))</code> 的值？</p>
+<p>B：是的。</p>
+<p>A：所以？</p>
+<p>B：<code>shuffle</code> 函数不是完全的，因为它现在再次交换了偶对的两部分，这说明我们重新来了一遍。</p>
+<p>A：这个函数是完全的吗？</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">(<span class="name">define</span> C</div><div class="line">  (<span class="name">lambda</span> (<span class="name">n</span>)</div><div class="line">    (<span class="name">cond</span></div><div class="line">      ((<span class="name">one</span>? n) <span class="number">1</span></div><div class="line">      (<span class="name">else</span> cond</div><div class="line">        (<span class="name">cond</span></div><div class="line">          ((<span class="name">even</span>? n) (<span class="name">C</span> (<span class="name">/</span> (<span class="name">n</span> <span class="number">2</span>)))</div><div class="line">          (<span class="name">else</span> (<span class="name">C</span> (<span class="name">add1</span> (<span class="name">*</span> <span class="number">3</span> n)))))))))</div></pre></td></tr></table></figure>
+<p>B：它不能产生 0，但除此之外没人知道为啥。谢谢你，<a href="http://en.wikipedia.org/wiki/Lothar_Collatz" target="_blank" rel="external">Lothar Collatz (1910-1990)</a>（<a href="http://zh.wikipedia.org/wiki/%E8%80%83%E6%8B%89%E5%85%B9%E7%8C%9C%E6%83%B3" target="_blank" rel="external">考拉兹猜想</a>）。</p>
+<p>A：<code>(A 1 0)</code> 的值是什么？</p>
+<p>B：2。</p>
+<p>A：<code>(A 1 1)</code>？</p>
+<p>B：3。</p>
+<p>A：<code>(A 2 2)</code>？</p>
+<p>B：7。</p>
+<p>A：这是 <code>A</code> 的定义：</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">(<span class="name">define</span> A</div><div class="line">  (<span class="name">lambda</span> (<span class="name">n</span>, m)</div><div class="line">    (<span class="name">cond</span></div><div class="line">      ((<span class="name">zero</span>? n) (<span class="name">add1</span> m))</div><div class="line">      ((<span class="name">zero</span>? m) (<span class="name">A</span> (<span class="name">sub1</span> n) <span class="number">1</span>))</div><div class="line">      (<span class="name">else</span> (<span class="name">A</span> (<span class="name">sub1</span> n)</div><div class="line">              (<span class="name">A</span> n (<span class="name">sub1</span> m)))))))</div></pre></td></tr></table></figure>
+<p>B：谢谢你，<a href="http://en.wikipedia.org/wiki/Wilhelm_Ackermann" target="_blank" rel="external">Wilhelm Ackermann (1853-1946)</a>（<a href="http://zh.wikipedia.org/wiki/%E9%98%BF%E5%85%8B%E6%9B%BC%E5%87%BD%E6%95%B8" target="_blank" rel="external">阿克曼函数</a>）。</p>
+<p>A：<code>A</code> 与 <code>shuffle</code> 和 <code>looking</code> 间有什么相同之处？</p>
+<p>B：<code>A</code> 的参数像 <code>shuffle</code> 和 <code>looking</code> 的一样，不会随着递归必定降低。</p>
+<p>A：举个例子？</p>
+<p>B：这很容易：<code>(A 1 2)</code> 需要 <code>(A 0 (A 1 1))</code> 的值。而这又说明我们需要 <code>(A 0 3)</code> 的值。</p>
+<p>A：<code>A</code> 总会给出解答吗？</p>
+<p>B：是的，它是完全的。</p>
+<p>A：那么 <code>(A 4 3)</code> 是多少？</p>
+<p>B：对于实践情况来说，没有答案。</p>
+<p>A：这什么意思？</p>
+<p>B：在我们计算出 <code>(A 4 3)</code> 的结果之前你正在读的这页纸早就已经腐烂了。</p>
+<blockquote>
+<p>But answer came there none<br>And this was scarcely odd, because<br>They’d eaten every one.<br><em>The Walrus and The Carpenter</em><br><em>Lewis Carroll</em></p>
+</blockquote>
+<p>A：如果我们能写一个测定某函数能否对每个参数都有返回值的函数岂不是很棒？</p>
+<p>B：确实会很棒。目前我们已经看到了不返回的函数和返回太慢的函数，我们确实应该有这样一种工具。</p>
+<p>A：好的，让我们写写看。</p>
+<p>B：这听起来很复杂。一个函数可以有许多不同的参数。</p>
+<p>A：那么我们简化一下。作为一个热身练习，让我们只关注检查某函数对空列表是否停止的函数，这是最简单的参数了。</p>
+<p>B：这会简化很多。</p>
+<p>A：这是此函数的开头：</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">(<span class="name">define</span> will-stop?</div><div class="line">  (<span class="name">lambda</span> (<span class="name">f</span>)</div><div class="line">    ...))</div></pre></td></tr></table></figure>
+<p>你能补全点吗？</p>
+<p>B：它要干什么？</p>
+<p>A：<code>will-stop?</code> 会对每个参数返回值吗？</p>
+<p>B：这是最简单的部分：我们说它会返回 <code>#t</code> 或 <code>#f</code>，根据参数被应用上 <code>()</code> 时是否停止。</p>
+<p>A：那么 <code>will-stop?</code> 是完全的吗？</p>
+<p>B：是的。它始终返回 <code>#t</code> 或 <code>#f</code>。</p>
+<p>A：那我们来举些例子。这是第一个。当 <code>f</code> 是 <code>length</code> 时 <code>(will-stop? f)</code> 的结果是什么？</p>
+<p>B：我们知道当 <code>l</code> 是 <code>()</code> 时 <code>(length l)</code> 是 <code>0</code>。</p>
+<p>A：所以？</p>
+<p>B：所以 <code>(will-stop？ length)</code> 的值应当是 <code>#t</code>。</p>
+<p>A：没错。换一个例子呢？ <code>(will-stop? eternity)</code> 的结果是什么？</p>
+<p>B：<code>(eternity (quote ()))</code> 不会返回值。我们刚刚看到了。</p>
+<p>A：这就是说 <code>(will-stop? eternity)</code> 是 <code>#f</code>？</p>
+<p>B：嗯，是。</p>
+<p>A：还需要更多的例子吗？</p>
+<p>B：或许我们还需要另外一个例子。</p>
+<p>A：好的，这个函数可能是 <code>will-stop?</code> 的一个有趣的参数。</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">(<span class="name">define</span> last-try</div><div class="line">  (<span class="name">lambda</span> (<span class="name">x</span>)</div><div class="line">    (<span class="name">and</span> (<span class="name">will-stop</span>? last-try)</div><div class="line">      (<span class="name">eternity</span> x))))</div></pre></td></tr></table></figure>
+<p><code>(will-stop? last-try)</code> 的结果是什么？</p>
+<p>B：它做了啥？</p>
+<p>A：我们需要在 <code>()</code> 上测试它。</p>
+<p>B：如果我们想知道 <code>(last-try (quote ()))</code> 的值，那我们必须确定</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">(<span class="name">and</span> (<span class="name">will-stop</span>? last-try)</div><div class="line">  (<span class="name">eternity</span> (<span class="name">quote</span> ())))</div></pre></td></tr></table></figure>
+<p>的值。</p>
+<p>A：</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">(<span class="name">and</span> (<span class="name">will-stop</span>? last-try)</div><div class="line">  (<span class="name">eternity</span> (<span class="name">quote</span>())))</div></pre></td></tr></table></figure>
+<p>的值是什么？</p>
+<p>B：这取决于 <code>(will-stop? last-try)</code> 的值。</p>
+<p>A：那这只有两种可能。我们假设 <code>(will-stop? last-try)</code> 是 <code>#f</code>。</p>
+<p>B：好，那么 <code>(and #f (eternity (quote ())))</code> 是 <code>#f</code>， 因为 <code>(and #f ...)</code> 始终是 <code>#f</code>。</p>
+<p>A：所以 <code>(last-try (quote ()))</code> 停止了，对吧？</p>
+<p>B：确实停止了。</p>
+<p>A：但刚刚 <code>will-stop</code> 不是说的正相反？</p>
+<p>B：确实相反。我们假设 <code>(will-stop? last-try)</code> 的值是 <code>#f</code>，这说明 <code>last-try</code> 不会停止。</p>
+<p>A：所以我们弄错了 <code>(will-stop? last-try)</code>。</p>
+<p>B：是。它肯定返回 <code>#t</code>，因为 <code>will-stop?</code> 始终返回值。我们说过它是完全的。</p>
+<p>A：很好。如果 <code>(will-stop? last-try)</code> 是 <code>#t</code>，那 <code>(last-try (quote ()))</code> 的值是什么？</p>
+<p>B：现在我们只需确定 <code>(and #t (eternity (quote ())))</code> 的值，而这和 <code>(eternity (quote ()))</code> 的值一致。</p>
+<p>A：<code>(eternity (quote ()))</code> 的值是什么？</p>
+<p>B：它没有值。我们知道它不会停。</p>
+<p>A：但这就意味着我们又错了！</p>
+<p>B：是啊，因为这次我们假设 <code>(will-stop? last-try)</code> 是 <code>#t</code>。</p>
+<p>A：你觉得这意味着什么？</p>
+<p>B：这是我们的想法：“我们仔细检查了两种可能的情况。如果我们能<em>定义</em> <code>will-stop?</code>，那么 <code>(will-stop? last-try)</code> 肯定会产生 <code>#t</code> 或 <code>#f</code>。但是它不能——正是根据 <code>(will-stop?)</code> 被设想应做的那样。这肯定说明 <code>will-stop?</code> 不能被<em>定义</em>。”</p>
+<p>A：这是特别的吗？</p>
+<p>B：是的。这使得 <code>will-stop?</code> 是第一个我们能准确描述但不能在我们的语言中<em>定义</em>的函数。</p>
+<p>A：有什么方法能解决这个问题吗？</p>
+<p>B：没有。谢谢你，<a href="http://en.wikipedia.org/wiki/Alan_Turing" target="_blank" rel="external">Alan M Turing (1912-1954)</a> （<a href="http://zh.wikipedia.org/wiki/%E5%81%9C%E6%9C%BA%E9%97%AE%E9%A2%98" target="_blank" rel="external">停机问题</a>）和 <a href="http://en.wikipedia.org/wiki/Kurt_G%C3%B6del" target="_blank" rel="external">Kurt Gödel (1906-1978)</a>。</p>
+<p>A：<code>(define ...)</code> 是什么？</p>
+<p>B：这是个好问题。我们刚看到了 <code>(define ..)</code> 对 <code>will-stop?</code> 不管用。</p>
+<p>A：所以啥是递归定义呢？</p>
+<p>B：抓紧，深呼吸，准备好后向前冲。</p>
+<p>A：这是 <code>length</code> 函数吗？</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">(<span class="name">define</span> length</div><div class="line">  (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">    (<span class="name">cond</span></div><div class="line">      ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">      (<span class="name">else</span> (<span class="name">add1</span> (<span class="name">length</span> (<span class="name">cdr</span> l)))))))</div></pre></td></tr></table></figure>
+<p>B：必须是啊。</p>
+<p>A：如果我们没有 <code>(define ...)</code> 该怎么办？我们还能定义 <code>length</code> 吗？</p>
+<p>B：没有 <code>(define ...)</code>，就不能在 <code>length</code> 的定义体中引用到 <code>length</code>。</p>
+<p>A：这个函数做了啥？</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">(<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">  (<span class="name">cond</span></div><div class="line">    ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">    (<span class="name">else</span> (<span class="name">add1</span> (<span class="name">eternity</span> (<span class="name">cdr</span> l))))))</div></pre></td></tr></table></figure>
+<p>B：它确定空列表的长度，没了。</p>
+<p>A：当我们在一个非空列表上用它时会怎样？</p>
+<p>B：没答案。如果我们给 <code>eternity</code> 一个参数，它不会给出答案。</p>
+<p>A：对于 <code>length</code> 这样的函数这说明什么？</p>
+<p>B：对非空列表来说其不会给出任何答案。</p>
+<p>A：假设我们可以命名这个新函数。啥名字好？</p>
+<p>B：<code>length0</code>。因为这个函数只能确定空列表的长度。</p>
+<p>A：你如何写一个确定包含一个或多个元素的列表的长度的函数？</p>
+<p>B：呃，我们可以试试下面这个。</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">(<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">  (<span class="name">cond</span></div><div class="line">    ((<span class="name">null</span>? <span class="number">0</span>)</div><div class="line">    (<span class="name">else</span> (<span class="name">add1</span> (<span class="name">length0</span> (<span class="name">cdr</span> l))))))</div></pre></td></tr></table></figure>
+<p>A：差不多，但 <code>(define ...)</code> 对 <code>length0</code> 不管用。</p>
+<p>B：所以，替换 <code>length0</code> 为它的定义。</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">(<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">  (<span class="name">cond</span></div><div class="line">    ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">    (<span class="name">else</span></div><div class="line">      (<span class="name">add</span> <span class="number">1</span></div><div class="line">        ((<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">          (<span class="name">cond</span></div><div class="line">            ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">            (<span class="name">else</span> (<span class="name">add1</span></div><div class="line">                    (<span class="name">eternity</span> (<span class="name">cdr</span> l))))))</div><div class="line">          (<span class="name">cdr</span> l))))))</div></pre></td></tr></table></figure>
+<p>A：那这个函数叫啥好呢？</p>
+<p>B：很简单：<code>length≤1</code>。</p>
+<p>A：这是能确定包含两个或更少项的列表长度的函数吗？</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">(<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">  (<span class="name">cond</span></div><div class="line">    ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">    (<span class="name">else</span></div><div class="line">      (<span class="name">add1</span></div><div class="line">        ((<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">           (<span class="name">cond</span></div><div class="line">             ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">             (<span class="name">else</span></div><div class="line">               (<span class="name">add1</span></div><div class="line">                 ((<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">                   (<span class="name">cond</span></div><div class="line">                     ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">                     (<span class="name">else</span></div><div class="line">                       (<span class="name">add1</span></div><div class="line">                         (<span class="name">eternity</span></div><div class="line">                           (<span class="name">cdr</span> l))))))</div><div class="line">                   (<span class="name">cdr</span> l))))))</div><div class="line">          (<span class="name">cdr</span> l))))))</div></pre></td></tr></table></figure>
+<p>B：是的，这就是 <code>length≤2</code>。我们仅把 <code>eternity</code> 换成了下一版的 <code>length</code>。</p>
+<p>A：现在，你觉得递归是什么？</p>
+<p>B：啥意思？</p>
+<p>A：我们已经看到了如何确定空列表的长度、不多于一项列表的长度和不多于两项列表的长度等等。我们如何才能实现原先的 <code>length</code> 函数？</p>
+<p>B：如果我们能写无穷多个函数，以 <code>length0</code>、<code>length≤1</code>、<code>length≤2</code>、……这样的形式，那我们就可以写出 <code>length∞</code>，这就可以确定我们能做出的所有列表的长度。</p>
+<p>A：我们能做出多长的列表？</p>
+<p>B：呃，列表可能是空的，或者包含一个元素，或者两个，或者三个，或者四个，……，或者 1001 个，……</p>
+<p>A：但我们不能写出一个无穷的函数。</p>
+<p>B：不能。</p>
+<p>A：而且我们仍旧在这些函数里面有这些重复和模式。</p>
+<p>B：是的。</p>
+<p>A：这些模式像什么？</p>
+<p>B：所有的这些程序包含一个像 <code>length</code> 的函数。或许我们应该抽象出这个函数：参见第九戒。</p>
+<blockquote>
+<p>第九戒<br>用新函数抽象通用模式</p>
+</blockquote>
+<p>A：让我们试试看！</p>
+<p>B：我们需要一个看起来像 <code>length</code> 但由 <code>(lambda (length) ...)</code> 开头的函数。</p>
+<p>A：你是说这个？</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">((<span class="name">lambda</span> (<span class="name">length</span>)</div><div class="line">  (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">    (<span class="name">cond</span></div><div class="line">      ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">      (<span class="name">else</span> (<span class="name">add1</span> (<span class="name">length</span> (<span class="name">cdr</span> l)))))))</div><div class="line">  eternity)</div></pre></td></tr></table></figure>
+<p>B：嗯，可以。这创建了 <code>length0</code>。</p>
+<p>A：用同样的方式重写 <code>length≤1</code>。</p>
+<p>B：</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">((<span class="name">lambda</span> (<span class="name">f</span>)</div><div class="line">  (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">    (<span class="name">cond</span></div><div class="line">      ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">      (<span class="name">else</span> (<span class="name">add1</span> (<span class="name">f</span> (<span class="name">cdr</span> l)))))))</div><div class="line">  ((<span class="name">lambda</span> (<span class="name">g</span>)</div><div class="line">    (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">      (<span class="name">cond</span></div><div class="line">        ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">        (<span class="name">else</span> (<span class="name">add1</span> (<span class="name">g</span> (<span class="name">cdr</span> l)))))))</div><div class="line">    eternity))</div></pre></td></tr></table></figure>
+<p>A：我们必须用 <code>length</code> 来命名参数吗？</p>
+<p>B：不用，我们只用了 <code>f</code> 和 <code>g</code>。只要我们保持一致，任何事都没问题。</p>
+<p>A：那 <code>length≤2</code> 呢？</p>
+<p>B：</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">((<span class="name">lambda</span> (<span class="name">length</span>)</div><div class="line">  (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">    (<span class="name">cond</span></div><div class="line">      ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">      (<span class="name">else</span> (<span class="name">add1</span> (<span class="name">length</span> (<span class="name">cdr</span> l)))))))</div><div class="line">  ((<span class="name">lambda</span> (<span class="name">length</span>)</div><div class="line">    (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">      (<span class="name">cond</span></div><div class="line">        ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">        (<span class="name">else</span> (<span class="name">add1</span> (<span class="name">length</span> (<span class="name">cdr</span> l)))))))</div><div class="line">    ((<span class="name">lambda</span> (<span class="name">length</span>)</div><div class="line">      (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">        (<span class="name">cond</span></div><div class="line">          ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">          (<span class="name">else</span> (<span class="name">add1</span> (<span class="name">length</span> (<span class="name">cdr</span> l)))))))</div><div class="line">      eternity)))</div></pre></td></tr></table></figure>
+<p>A：快了，但现在仍有重复。</p>
+<p>B：确实。让我们去掉它们。</p>
+<p>A：我们从哪开始？</p>
+<p>B：给这个以 <code>length</code> 作为参数返回另一个类似 <code>length</code> 函数的函数起个名字。</p>
+<p>A：这个函数啥名字好？</p>
+<p>B：<code>mk-length</code> 咋样？意思是 make length。</p>
+<p>A：行，在 <code>length0</code> 上试试。</p>
+<p>B：没问题。</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">((<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">  (<span class="name">mk-length</span> eternity))</div><div class="line">  (<span class="name">lambda</span> (<span class="name">length</span>)</div><div class="line">    (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">      (<span class="name">cond</span></div><div class="line">        ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">        (<span class="name">else</span> (<span class="name">add1</span> (<span class="name">length</span> (<span class="name">cdr</span> l))))))))</div></pre></td></tr></table></figure>
+<p>A：这是 <code>length≤1</code> 吗？</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">((<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">  (<span class="name">mk-length</span></div><div class="line">    (<span class="name">mk-length</span> eternity)))</div><div class="line">  (<span class="name">lambda</span> (<span class="name">length</span>)</div><div class="line">    (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">      (<span class="name">cond</span></div><div class="line">        ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">        (<span class="name">else</span> (<span class="name">add1</span> (<span class="name">length</span> (<span class="name">cdr</span> l))))))))</div></pre></td></tr></table></figure>
+<p>B：当然。然后这是 <code>length≤2</code>。</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">((<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">  (<span class="name">mk-length</span></div><div class="line">    (<span class="name">mk-length</span></div><div class="line">      (<span class="name">mk-length</span> eternity))))</div><div class="line">  (<span class="name">lambda</span> (<span class="name">length</span>)</div><div class="line">    (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">      (<span class="name">cond</span></div><div class="line">        ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">        (<span class="name">else</span> (<span class="name">add1</span> (<span class="name">length</span> (<span class="name">cdr</span> l))))))))</div></pre></td></tr></table></figure>
+<p>A：你能以这种方法写出 <code>length≤3</code> 吗？</p>
+<p>B：妥妥的。这就是。</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">((<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">  (<span class="name">mk-length</span></div><div class="line">    (<span class="name">mk-length</span></div><div class="line">      (<span class="name">mk-length</span></div><div class="line">        (<span class="name">mk-length</span> eternity)))))</div><div class="line">  (<span class="name">lambda</span> (<span class="name">length</span>)</div><div class="line">    (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">      (<span class="name">cond</span></div><div class="line">        ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">        (<span class="name">else</span> (<span class="name">add1</span> (<span class="name">length</span> (<span class="name">cdr</span> l))))))))</div></pre></td></tr></table></figure>
+<p>A：递归像什么？</p>
+<p>B：像一座对任意函数应用 <code>mk-length</code> 的无限高的塔。</p>
+<p>A：我们真的需要一个无限高的塔吗？</p>
+<p>B：当然不必要。每次使用 <code>length</code> 时我们只需要有限的数量，但是我们不知道是多少。</p>
+<p>A：我们能猜出来需要多少吗？</p>
+<p>B：可以，但我们有时候猜的不够大。</p>
+<p>A：如果猜的不够大，什么时候我们才能知道？</p>
+<p>B：当我们应用传递给最内层 <code>mk-length</code> 的 <code>eternity</code> 函数时。</p>
+<p>A：如果此时我们能创建对 <code>mk-length</code> 应用 <code>eternity</code> 的另一个应用会发生什么？</p>
+<p>B：这只会将问题推迟一点，另外，我们怎样才能做到这点呢？</p>
+<p>A：因为没人关心我们给 <code>mk-length</code> 传递了什么函数，我们可以从一开始就传递 <code>mk-length</code>。</p>
+<p>B：这是个好主意。然后我们在 <code>eternity</code> 上应用 <code>mk-length</code>，在 <code>cdr</code> 上应用其结果，这样我们就从塔上多得到了一层。</p>
+<p>A：那么这仍旧是 <code>length0</code>。</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">((<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">  (<span class="name">mk-length</span> mk-length))</div><div class="line">  (<span class="name">lambda</span> (<span class="name">length</span>)</div><div class="line">    (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">      (<span class="name">cond</span></div><div class="line">        ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">        (<span class="name">else</span> (<span class="name">add1</span></div><div class="line">                (<span class="name">length</span> (<span class="name">cdr</span> l))))))))</div></pre></td></tr></table></figure>
+<p>B：是的，我们甚至能用 <code>mk-length</code> 替代 <code>length</code>。</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">((<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">  (<span class="name">mk-length</span> mk-length))</div><div class="line">  (<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">    (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">      (<span class="name">cond</span></div><div class="line">        ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">        (<span class="name">else</span> (<span class="name">add1</span></div><div class="line">                (<span class="name">mk-length</span> (<span class="name">cdr</span> l))))))))</div></pre></td></tr></table></figure>
+<p>A：为什么我们想这样做？</p>
+<p>B：所有名字都是平等的，但有些名字比其他名字更平等。</p>
+<p>A：真理：只要我们一致地使用名字，我们就没问题。</p>
+<p>B：<code>mk-length</code> 比 <code>length</code> 平等得多。如果我们用类似 <code>mk-length</code> 这样的名字，这就像一个提示，提示我们 <code>mk-length</code> 的第一个参数是 <code>mk-length</code>。</p>
+<p>A：现在 <code>mk-length</code> 被传递给 <code>mk-length</code>， 我们能用参数来构建另一个递归调用吗？</p>
+<p>B：能，当我们应用 <code>mk-length</code> 一次，我们得到 <code>length≤1</code>。</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">((<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">  (<span class="name">mk-length</span> mk-length))</div><div class="line">  (<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">    (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">      (<span class="name">cond</span></div><div class="line">        ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">        (<span class="name">else</span> (<span class="name">add1</span></div><div class="line">                ((<span class="name">mk-length</span> eternity)</div><div class="line">                  (<span class="name">cdr</span> l))))))))</div></pre></td></tr></table></figure>
+<p>A：当 <code>l</code> 是 <code>(apples)</code> 时</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">(((<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">  (<span class="name">mk-length</span> mk-length))</div><div class="line">  (<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">    (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">      (<span class="name">cond</span></div><div class="line">        ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">        (<span class="name">else</span> (<span class="name">add1</span></div><div class="line">                ((<span class="name">mk-length</span> eternity)</div><div class="line">                  (<span class="name">cdr</span> l))))))))</div><div class="line">  l)</div></pre></td></tr></table></figure>
+<p>的结果是什么？</p>
+<p>B：这是个好练习。不用纸笔解出它。</p>
+<p>A：我们能这样做多于一次吗？</p>
+<p>B：可以，不断把 <code>mk-length</code> 传递给自己就行，我们可以随时需要随时做！</p>
+<p>A：你把这个函数叫做什么？</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">((<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">  (<span class="name">mk-length</span> mk-length))</div><div class="line">  (<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">    (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">      (<span class="name">cond</span></div><div class="line">        ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">        (<span class="name">else</span> (<span class="name">add1</span></div><div class="line">                ((<span class="name">mk-length</span> mk-length)</div><div class="line">                  (<span class="name">cdr</span> l))))))))</div></pre></td></tr></table></figure>
+<p>B：这是必须是 <code>length</code> 啊。</p>
+<p>A：它是如何运作的？</p>
+<p>B：它向自身传递 <code>mk-length</code> 来不断添加递归操作，就像它即将到期一样。</p>
+<p>A：还剩一个问题：它不包含一个像 <code>length</code> 的函数了。</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">((<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">  (<span class="name">mk-length</span> mk-length))</div><div class="line">  (<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">    (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">      (<span class="name">cond</span></div><div class="line">        ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">        (<span class="name">else</span> (<span class="name">add1</span></div><div class="line">               <span class="comment">;;;;;;;;;;;;;;;;;;;;;;;;</span></div><div class="line">                ((<span class="name">mk-length</span> mk-length)</div><div class="line">               <span class="comment">;;;;;;;;;;;;;;;;;;;;;;;;</span></div><div class="line">                  (<span class="name">cdr</span> l))))))))</div></pre></td></tr></table></figure>
+<p>你能改改这个吗？</p>
+<p>B：我们可以把将 <code>mk-length</code> 应用到自身的这个过程抽取出来并称为 <code>length</code>。</p>
+<p>A：为啥？</p>
+<p>B：因为它确实实现了 <code>length</code> 这个功能。</p>
+<p>A：这个怎样？</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">((<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">  (<span class="name">mk-length</span> mk-length))</div><div class="line">  (<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">    ((<span class="name">lambda</span> (<span class="name">length</span>)</div><div class="line">      (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">        (<span class="name">cond</span></div><div class="line">          ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">          (<span class="name">else</span> (<span class="name">add1</span> (<span class="name">length</span> (<span class="name">cdr</span> l)))))))</div><div class="line">      (<span class="name">mk-length</span> mk-length))))</div></pre></td></tr></table></figure>
+<p>B：看起来不错。</p>
+<p>A：让我们看看它是否能行。</p>
+<p>B：好。</p>
+<p>A：当 <code>l</code> 是 <code>(apples)</code> 时</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">(((<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">  (<span class="name">mk-length</span> mk-length))</div><div class="line">  (<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">    ((<span class="name">lambda</span> (<span class="name">length</span>)</div><div class="line">      (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">        (<span class="name">cond</span></div><div class="line">          ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">          (<span class="name">else</span> (<span class="name">add1</span> (<span class="name">length</span> (<span class="name">cdr</span> l)))))))</div><div class="line">      (<span class="name">mk-length</span> mk-length))))</div><div class="line">  l)</div></pre></td></tr></table></figure>
+<p>的结果是什么？</p>
+<p>B：应该是 <code>1</code>。</p>
+<p>A：首先，我们需要</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">((<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">  (<span class="name">mk-length</span> mk-length))</div><div class="line">  (<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">    ((<span class="name">lambda</span> (<span class="name">length</span>)</div><div class="line">      (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">        (<span class="name">cond</span></div><div class="line">          ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">          (<span class="name">else</span> (<span class="name">add1</span> (<span class="name">length</span> (<span class="name">cdr</span> l)))))))</div><div class="line">      (<span class="name">mk-length</span> mk-length))))</div></pre></td></tr></table></figure>
+<p>的值。</p>
+<p>B：确实，因为这个表达式的值正是我们要应用 <code>l</code> 的函数，其中 <code>l</code> 是 <code>(apples)</code>。</p>
+<p>A：所以我们其实需要</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">((<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">  ((<span class="name">lambda</span> (<span class="name">length</span>)</div><div class="line">    (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">      (<span class="name">cond</span></div><div class="line">        ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">        (<span class="name">else</span> (<span class="name">add1</span> (<span class="name">length</span> (<span class="name">cdr</span> l)))))))</div><div class="line">    (<span class="name">mk-length</span> mk-length)))</div><div class="line">  (<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">    ((<span class="name">lambda</span> (<span class="name">length</span>)</div><div class="line">      (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">        (<span class="name">cond</span></div><div class="line">          ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">          (<span class="name">else</span> (<span class="name">add1</span> (<span class="name">length</span> (<span class="name">cdr</span> l))))))</div><div class="line">      (<span class="name">mk-length</span> mk-length))))</div></pre></td></tr></table></figure>
+<p>的值。</p>
+<p>B：确实。</p>
+<p>A：但之后我们其实需要</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">((<span class="name">lambda</span> (<span class="name">length</span>)</div><div class="line">  (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">    (<span class="name">cond</span></div><div class="line">      ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">      (<span class="name">else</span> (<span class="name">add1</span> (<span class="name">length</span> (<span class="name">cdr</span> l)))))))</div><div class="line">  ((<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">    ((<span class="name">lambda</span> (<span class="name">length</span>)</div><div class="line">      (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">        (<span class="name">cond</span></div><div class="line">          ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">          (<span class="name">else</span> (<span class="name">add1</span> (<span class="name">length</span> (<span class="name">cdr</span> l)))))))</div><div class="line">      (<span class="name">mk-length</span> mk-length)))</div><div class="line">    (<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">      ((<span class="name">lambda</span> (<span class="name">length</span>)</div><div class="line">        (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">          (<span class="name">cond</span></div><div class="line">            ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">            (<span class="name">else</span> (<span class="name">add1</span> (<span class="name">length</span> (<span class="name">cdr</span> l)))))))</div><div class="line">        (<span class="name">mk-length</span> mk-length)))))</div></pre></td></tr></table></figure>
+<p>的值。</p>
+<p>B：是的，确实。这个的终点在哪？我们不还依旧需要</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">((<span class="name">lambda</span> (<span class="name">length</span>)</div><div class="line">  (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">    (<span class="name">cond</span></div><div class="line">      ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">      (<span class="name">else</span> (<span class="name">add1</span> (<span class="name">length</span> (<span class="name">cdr</span> l)))))))</div><div class="line">  ((<span class="name">lambda</span> (<span class="name">length</span>)</div><div class="line">    (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">      (<span class="name">cond</span></div><div class="line">        ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">        (<span class="name">else</span> (<span class="name">add1</span> (<span class="name">length</span> (<span class="name">cdr</span> l)))))))</div><div class="line">    ((<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">      ((<span class="name">lambda</span> (<span class="name">length</span>)</div><div class="line">        (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">          (<span class="name">cond</span></div><div class="line">            ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">            (<span class="name">else</span> (<span class="name">add1</span> (<span class="name">length</span> (<span class="name">cdr</span> l)))))))</div><div class="line">        (<span class="name">mk-length</span> mk-length)))</div><div class="line">      (<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">        ((<span class="name">lambda</span> (<span class="name">length</span>)</div><div class="line">          (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">            (<span class="name">cond</span></div><div class="line">              ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">              (<span class="name">else</span> (<span class="name">add1</span> (<span class="name">length</span> (<span class="name">cdr</span> l)))))))</div><div class="line">          (<span class="name">mk-length</span> mk-length))))))</div></pre></td></tr></table></figure>
+<p>的值？</p>
+<p>A：是，这没个头啊。为啥呢？</p>
+<p>B：因为我们只是一遍一遍地把 <code>mk-length</code> 应用到自己。</p>
+<p>A：这很奇怪吧？</p>
+<p>B：因为之前 <code>mk-length</code> 在我们应用一个参数时会返回一个函数。实际上，它不关心我们应用了什么。</p>
+<p>A：但现在我们把 <code>(mk-length mk-length)</code> 从 <code>length</code> 函数中抽取了出来，它就不在返回函数了。</p>
+<p>B：嗯是。所以该咋办？</p>
+<p>A：把最后正确版本的 <code>mk-length</code> 转换成一个函数：</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">((<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">  (<span class="name">mk-length</span> mk-length))</div><div class="line">  (<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">    (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">      (<span class="name">cond</span></div><div class="line">        ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">        (<span class="name">else</span> (<span class="name">add1</span></div><div class="line">               <span class="comment">;;;;;;;;;;;;;;;;;;;;;;;;</span></div><div class="line">                ((<span class="name">mk-length</span> mk-length)</div><div class="line">               <span class="comment">;;;;;;;;;;;;;;;;;;;;;;;;</span></div><div class="line">                  (<span class="name">cdr</span> l))))))))</div></pre></td></tr></table></figure>
+<p>B：咋弄？</p>
+<p>A：有个不同的办法。如果 <code>f</code> 是个一元函数，那么 <code>(lambda (x) (f x))</code> 也是个一元函数吗？</p>
+<p>B：是。</p>
+<p>A：如果 <code>(mk-length mk-length)</code> 返回一个一元函数，那么</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">(<span class="name">lambda</span> (<span class="name">x</span>)</div><div class="line">  ((<span class="name">mk-length</span> mk-length) x))</div></pre></td></tr></table></figure>
+<p>也返回一个一元函数吗？</p>
+<p>B：实际上，</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">(<span class="name">lambda</span> (<span class="name">x</span>)</div><div class="line">  ((<span class="name">mk-length</span> mk-length) x))</div></pre></td></tr></table></figure>
+<p>是一个函数！</p>
+<p>A：很好，让我们处理下 <code>mk-length</code> 对自己的应用。</p>
+<p>B：</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">((<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">  (<span class="name">mk-length</span> mk-length))</div><div class="line">  (<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">    (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">      (<span class="name">cond</span></div><div class="line">        ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">        (<span class="name">else</span> (<span class="name">add1</span></div><div class="line">               <span class="comment">;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;</span></div><div class="line">                ((<span class="name">lambda</span> (<span class="name">x</span>)</div><div class="line">                  ((<span class="name">mk-length</span> mk-length) x))</div><div class="line">               <span class="comment">;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;</span></div><div class="line">                  (<span class="name">cdr</span> l))))))))</div></pre></td></tr></table></figure>
+<p>A：把新函数移出来我们就找回了 <code>length</code>。</p>
+<p>B：</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">((<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">  (<span class="name">mk-length</span> mk-length))</div><div class="line">  (<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">   <span class="comment">;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;</span></div><div class="line">    ((<span class="name">lambda</span> (<span class="name">length</span>)</div><div class="line">      (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">        (<span class="name">cond</span></div><div class="line">          ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">          (<span class="name">else</span></div><div class="line">            (<span class="name">add1</span> (<span class="name">length</span> (<span class="name">cdr</span> l)))))))</div><div class="line">   <span class="comment">;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;</span></div><div class="line">      (<span class="name">lambda</span> (<span class="name">x</span>)</div><div class="line">        ((<span class="name">mk-length</span> mk-length) x)))))</div></pre></td></tr></table></figure>
+<p>A：把函数移出来没问题吗？</p>
+<p>B：我们只是做了把名字换成值正相反的事。这里我们抽取出值并给它一个名字。</p>
+<p>A：我们能把方框里像 <code>length</code> 的那个函数抽取出来并命名吗？</p>
+<p>B：可以，它根本不依赖于 <code>mk-length</code>！</p>
+<p>A：这是正确的函数吗？</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">((<span class="name">lambda</span> (<span class="name">le</span>)</div><div class="line">  ((<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">    (<span class="name">mk-length</span> mk-length))</div><div class="line">    (<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">      (<span class="name">le</span> (<span class="name">lambda</span> (<span class="name">x</span>)</div><div class="line">            ((<span class="name">mk-length</span> mk-length) x)))))))</div><div class="line">  (<span class="name">lambda</span> (<span class="name">length</span>)</div><div class="line">    (<span class="name">lambda</span> (<span class="name">l</span>)</div><div class="line">      (<span class="name">cond</span></div><div class="line">        ((<span class="name">null</span>? l) <span class="number">0</span>)</div><div class="line">          (<span class="name">else</span> (<span class="name">add1</span> (<span class="name">length</span> (<span class="name">cdr</span> l)))))))</div></pre></td></tr></table></figure>
+<p>B：对。</p>
+<p>A：我们实际上得到了啥？</p>
+<p>B：我们抽取出了原先的函数 <code>mk-length</code>。</p>
+<p>A：让我们从像 <code>length</code> 的函数中分出创建 <code>length</code> 的函数。</p>
+<p>B：这很简单。</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">(<span class="name">lambda</span> (<span class="name">le</span>)</div><div class="line">  ((<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">    (<span class="name">mk-length</span> mk-length))</div><div class="line">    (<span class="name">lambda</span> (<span class="name">mk-length</span>)</div><div class="line">      (<span class="name">le</span> (<span class="name">lambda</span> (<span class="name">x</span>)</div><div class="line">            ((<span class="name">mk-length</span> mk-length) x))))))</div></pre></td></tr></table></figure>
+<p>A：这个函数有名字吗？</p>
+<p>B：有，这叫做<a href="http://zh.wikipedia.org/wiki/%E4%B8%8D%E5%8A%A8%E7%82%B9%E7%BB%84%E5%90%88%E5%AD%90" target="_blank" rel="external">应用序 Y 组合子（applicative-order Y combinator）</a>。</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">(<span class="name">define</span> Y</div><div class="line">  (<span class="name">lambda</span> (<span class="name">le</span>)</div><div class="line">    ((<span class="name">lambda</span> (<span class="name">f</span>) (<span class="name">f</span> f))</div><div class="line">      (<span class="name">lambda</span> (<span class="name">f</span>)</div><div class="line">        (<span class="name">le</span> (<span class="name">lambda</span> (<span class="name">x</span>) ((<span class="name">f</span> f) x)))))))</div></pre></td></tr></table></figure>
+<p>A：<code>(define ...)</code> 又能用了？</p>
+<p>B：是，现在我们知道递归是什么了。</p>
+<p>A：你知道为啥 <code>Y</code> 管用吗？</p>
+<p>B：重新阅读本章你就懂了。</p>
+<p>A：啥是 <code>(Y Y)</code>。</p>
+<p>B：鬼知道，看起来很复杂。</p>
+<p>A：你的帽子还合适不？</p>
+<p>B：在如此一场头脑风暴之后很难说啊。</p>
+<blockquote>
+<p>Stop the World - I Want to Get Off.<br><em>Leslie Bricusse and Anthony Newley</em></p>
+</blockquote>
+</div></article></div></main><footer><div class="paginator"><a href="/2015-02-19/" class="prev">PREV</a><a href="/todos-2015/" class="next">NEXT</a></div><div class="copyright"><p>© 2015 - 2018 <a href="http://stormluke.me">stormluke</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

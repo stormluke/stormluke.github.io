@@ -1,0 +1,75 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> 函数式编程笔记 04 · Preferences</title><meta name="description" content="函数式编程笔记 04 - stormluke"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://stormluke.me/atom.xml" title="Preferences"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/sunchongsheng" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/pinggod" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">函数式编程笔记 04</h1><div class="post-info">Jun 29, 2013</div><div class="post-content"><h3 id="练习：找不动点"><a href="#练习：找不动点" class="headerlink" title="练习：找不动点"></a>练习：找不动点</h3><p>数x叫做一个函数的<em>不动点</em>，如果f(x) = x。</p>
+<p>程序：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">object</span> <span class="title">exercise</span> </span>&#123;</div><div class="line">  <span class="keyword">val</span> tolerance = <span class="number">0.0001</span>                          <span class="comment">//&gt; tolerance  : Double = 1.0E-4</span></div><div class="line">  <span class="function"><span class="keyword">def</span> <span class="title">abs</span></span>(x: <span class="type">Double</span>) = <span class="keyword">if</span> (x &gt;= <span class="number">0</span>) x <span class="keyword">else</span> -x      <span class="comment">//&gt; abs: (x: Double)Double</span></div><div class="line">  <span class="function"><span class="keyword">def</span> <span class="title">isCloseEnough</span></span>(x: <span class="type">Double</span>, y: <span class="type">Double</span>) =</div><div class="line">    abs((x - y) / x) / x <span class="comment">//&gt; isCloseEnough: (x: Double, y: Double)Boolean</span></div><div class="line">  <span class="function"><span class="keyword">def</span> <span class="title">fixedPoint</span></span>(f: <span class="type">Double</span> =&gt; <span class="type">Double</span>)(firstGuess: <span class="type">Double</span>) = &#123;</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">iterate</span></span>(guess: <span class="type">Double</span>): <span class="type">Double</span> = &#123;</div><div class="line">      <span class="keyword">val</span> next = f(guess)</div><div class="line">      <span class="keyword">if</span>(isCloseEnough(guess, next)) next</div><div class="line">      <span class="keyword">else</span> iterate(next)</div><div class="line">    &#125;</div><div class="line">    iterate(firstGuess)</div><div class="line">  &#125;                                               <span class="comment">//&gt; fixedPoint: (f: Double =&gt; Double)(firstGuess: Double)Double</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<a id="more"></a>
+<p>之前的<code>sqrt</code>函数可以改为求<code>y = x / y</code>的<code>y</code>值，即<code>y =&gt; x / y</code>的不动点。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">sqrt</span></span>(x: <span class="type">Double</span>) =</div><div class="line">    fixedPoint(y =&gt; x / y)(<span class="number">1.0</span>)</div></pre></td></tr></table></figure>
+<p>如果按上面这样写就会陷入循环，比如<code>sqrt(2)</code>时每次的<code>guess</code>在1.0、2.0反复。一个解决的办法是<em>平均</em>原序列的后继值：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">sqrt</span></span>(x: <span class="type">Double</span>) =</div><div class="line">  fixedPoint(y =&gt; (y + x / y) / <span class="number">2</span>)(<span class="number">1.0</span>)</div></pre></td></tr></table></figure>
+<p>其实这种<em>求平均以稳定化</em>的方法很普遍，可以被抽取成一个函数。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">averageDamp</span></span>(f: <span class="type">Double</span> =&gt; <span class="type">Double</span>)(x: <span class="type">Double</span>) = (x + f(x)) / <span class="number">2</span></div></pre></td></tr></table></figure>
+<p>然后<code>sqrt</code>函数就可以这样写了：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">sqrt</span></span>(x: <span class="type">Double</span>) = fixedPoint(averageDamp(y =&gt; x / y))(<span class="number">1.0</span>)</div></pre></td></tr></table></figure>
+<h3 id="类"><a href="#类" class="headerlink" title="类"></a>类</h3><p>语法什么的不想写了……</p>
+<p>类的求值方法和函数的一样，都是call-by-value。就是说<code>new C(e1, …, em)</code>会变成<code>new C(v1, …, vm)</code>。</p>
+<p>现在假设有这样一个类定义：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">C</span>(<span class="params">x1, …, xm</span>) </span>&#123; … <span class="function"><span class="keyword">def</span> <span class="title">f</span></span>(y1, …, yn) = b …&#125;</div></pre></td></tr></table></figure>
+<p>那么下面这个表达式怎么被求值？</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">new</span> <span class="type">C</span>(v1, …, vm).f(w1, …, wn)</div></pre></td></tr></table></figure>
+<p>答案是，它会被重写成：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[w1/y1, …, wn/yn] [v1/x1, …, vm/xm] [<span class="keyword">new</span> <span class="type">C</span>(v1, …, vm)/<span class="keyword">this</span>] b</div></pre></td></tr></table></figure>
+<p>其中有三个替换过程：</p>
+<ol>
+<li>函数<code>f</code>的参数被求值</li>
+<li>类<code>C</code>的参数被求值</li>
+<li><code>this</code>引用被<code>new C(v1, …, vn)</code>替换</li>
+</ol>
+<p>看例子：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">new</span> <span class="type">Rational</span>(<span class="number">1</span>, <span class="number">2</span>).number</div><div class="line">-&gt; [<span class="number">1</span>/x, <span class="number">2</span>/y] [] [<span class="keyword">new</span> <span class="type">Rational</span>(<span class="number">1</span>, <span class="number">2</span>)/<span class="keyword">this</span>] x</div><div class="line">=  <span class="number">1</span></div></pre></td></tr></table></figure>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">new</span> <span class="type">Rational</span>(<span class="number">1</span>, <span class="number">2</span>).less(<span class="keyword">new</span> <span class="type">Rational</span>(<span class="number">2</span>, <span class="number">3</span>))</div><div class="line">-&gt; [<span class="number">1</span>/x, <span class="number">2</span>/y] [<span class="keyword">new</span> <span class="type">Rational</span>(<span class="number">2</span>, <span class="number">3</span>)/that] [<span class="keyword">new</span> <span class="type">Rational</span>(<span class="number">1</span>, <span class="number">2</span>)/<span class="keyword">this</span>] <span class="keyword">this</span>.number * that.denom <span class="keyword">this</span>.denom</div><div class="line">=  <span class="keyword">new</span> <span class="type">Rational</span>(<span class="number">1</span>, <span class="number">2</span>).number * <span class="keyword">new</span> <span class="type">Rational</span>(<span class="number">2</span>, <span class="number">3</span>).denom <span class="keyword">new</span> <span class="type">Rational</span>(<span class="number">2</span>, <span class="number">3</span>).number * <span class="keyword">new</span> <span class="type">Rational</span>(<span class="number">1</span>, <span class="number">2</span>).denom</div><div class="line">-&gt; <span class="number">1</span> * <span class="number">3</span> <span class="number">2</span> * <span class="number">2</span></div><div class="line">-&gt; <span class="literal">true</span></div></pre></td></tr></table></figure>
+<h3 id="操作符"><a href="#操作符" class="headerlink" title="操作符"></a>操作符</h3><p>之前如果<code>x</code>、<code>y</code>是整数，可以写<code>x + y</code>，但如果是<code>Rational</code>，则要写成<code>r.add(s)</code>。在Scala中，可以消除这种差异。</p>
+<h4 id="中缀标记"><a href="#中缀标记" class="headerlink" title="中缀标记"></a>中缀标记</h4><p>只有一个参数的方法可以像中缀操作符那样用。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">r add s == r.add(s)</div><div class="line">r less s == r.less(s)</div><div class="line">r max s == r.max(s)</div></pre></td></tr></table></figure>
+<h4 id="宽松的标识符"><a href="#宽松的标识符" class="headerlink" title="宽松的标识符"></a>宽松的标识符</h4><p>操作符可以用作标识符。</p>
+<p>标识符可以是：</p>
+<ul>
+<li>字母组成：字母开头，后跟一系列字母或数字</li>
+<li>符号组成：符号开头，后跟其他的符号</li>
+<li>下划线<code>_</code>算作字母</li>
+<li>字母组成的标识符也能以下划线后跟一些符号结束</li>
+</ul>
+<p>标识符例子：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">x1    *    +?%&amp;    vector_++    counter_=</div></pre></td></tr></table></figure>
+<p>然后就可以这样定义方法：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">+</span> </span>(r: <span class="type">Rational</span>) = …</div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">-</span> </span>(r: <span class="type">Rational</span>) = …</div></pre></td></tr></table></figure>
+<p>前置标识符也是可以的，方法要以<code>unary_</code>开头：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">unary_-</span> </span>: <span class="type">Rational</span> = <span class="keyword">new</span> <span class="type">Rational</span>(-number, denom)</div></pre></td></tr></table></figure>
+<p>这样用：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">x = <span class="keyword">new</span> <span class="type">Rational</span>(<span class="number">1</span>, <span class="number">2</span>)</div><div class="line">-x</div></pre></td></tr></table></figure>
+<p>如果方法名以符号结尾则要把之后的<code>:</code>用空格隔开，要不就会被误认为是方法名的一部分了。</p>
+<h3 id="优先级"><a href="#优先级" class="headerlink" title="优先级"></a>优先级</h3><p>操作符优先级由首字母决定。</p>
+<p>优先级的升序排列：</p>
+<ul>
+<li>所有字母</li>
+<li>|</li>
+<li>^</li>
+<li>&amp;</li>
+<li></li>
+<li>= !</li>
+<li>:</li>
+<li><ul>
+<li>-</li>
+</ul>
+</li>
+<li><ul>
+<li>/ %</li>
+</ul>
+</li>
+<li>所有其他运算符</li>
+</ul>
+<p>练习：给出下面的表达式的顺序</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">a + b ^? c ?^ d less a ==&gt; b | c</div></pre></td></tr></table></figure>
+<p>答案是：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">((a + b) ^? (c ?^ d)) less ((a ==&gt; b) | c)</div></pre></td></tr></table></figure>
+<p>绝不要写这样的代码……</p>
+</div></article></div></main><footer><div class="paginator"><a href="/functional-programming-note-05/" class="prev">PREV</a><a href="/functional-programming-note-03/" class="next">NEXT</a></div><div class="copyright"><p>© 2015 - 2018 <a href="http://stormluke.me">stormluke</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

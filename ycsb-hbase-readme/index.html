@@ -1,0 +1,198 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> 使用 YCSB 压力测试 HBase · Preferences</title><meta name="description" content="使用 YCSB 压力测试 HBase - stormluke"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://stormluke.me/atom.xml" title="Preferences"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/sunchongsheng" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/pinggod" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">使用 YCSB 压力测试 HBase</h1><div class="post-info">May 23, 2017</div><div class="post-content"><p><a href="https://github.com/brianfrankcooper/YCSB" target="_blank" rel="external">YCSB</a>（Yahoo! Cloud Serving Benchmark）是雅虎开源的用于测试新式数据库（主要为 NoSQL）性能的框架，使用 Java 实现，可以测试 HBase、Cassandra、Infinispan、MongoDB 等等。</p>
+<p>YCSB 包括两个部分：</p>
+<ul>
+<li>YCSB 客户端，一个可以扩展的 workload 生成器</li>
+<li>Core workloads，预先配置好的 workloads</li>
+</ul>
+<a id="more"></a>
+<h3 id="安装-YCSB"><a href="#安装-YCSB" class="headerlink" title="安装 YCSB"></a>安装 YCSB</h3><p>下载 <a href="https://github.com/brianfrankcooper/YCSB/releases/latest" target="_blank" rel="external">YCSB 最新发行版</a></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">curl -O --location https://github.com/brianfrankcooper/YCSB/releases/download/0.12.0/ycsb-0.12.0.tar.gz</div><div class="line">tar xfvz ycsb-0.12.0.tar.gz</div><div class="line"><span class="built_in">cd</span> ycsb-0.12.0</div></pre></td></tr></table></figure>
+<p>其中 <code>workloads</code> 文件夹中为预置的 Core workload，<code>*-binding</code> 文件夹中为预置的数据库接口层。</p>
+<h3 id="运行一个压力测试"><a href="#运行一个压力测试" class="headerlink" title="运行一个压力测试"></a>运行一个压力测试</h3><p>运行一个压力测试需要 6 步：</p>
+<ul>
+<li>配置需要测试的数据库</li>
+<li>选择合适的数据库接口层</li>
+<li>选择合适的 workload</li>
+<li>选择合适的运行时参数</li>
+<li>装载数据（loading phase）</li>
+<li>运行测试（transaction phase）</li>
+</ul>
+<p>这些步骤适合于在单个客户端上运行（小型和中型集群，10 个左右的服务节点），更大的集群需要多个客户端同时运行测试。</p>
+<h4 id="第一步：配置需要测试的数据库"><a href="#第一步：配置需要测试的数据库" class="headerlink" title="第一步：配置需要测试的数据库"></a>第一步：配置需要测试的数据库</h4><p>YCSB 不负责表的创建，需要在数据库中手动创建用于测试的表。例如在 HBase 中，需要手动创建一个表和一个列族。</p>
+<p>为了让测试数据均匀分布在不同节点中，创建 HBase 表时需要设置预先分片策略（参考 <a href="https://issues.apache.org/jira/browse/HBASE-4163" target="_blank" rel="external">HBASE-4163</a>）。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">hbase(main):001:0&gt; n_splits = 20 # HBase recommends (10 * number of regionservers)</div><div class="line">hbase(main):002:0&gt; create &apos;usertable&apos;, &apos;cf&apos;, &#123;SPLITS =&gt; (1..n_splits).map &#123;|i| &quot;user#&#123;1000+i*(9999-1000)/n_splits&#125;&quot;&#125;&#125;</div></pre></td></tr></table></figure>
+<p>这里 <code>n_splits</code> 推荐设置为 <code>RegionServer</code> 数量 * 10。</p>
+<h4 id="第二步：选择合适的数据库接口层"><a href="#第二步：选择合适的数据库接口层" class="headerlink" title="第二步：选择合适的数据库接口层"></a>第二步：选择合适的数据库接口层</h4><p>YCSB 预置了一些常用数据库的接口层，对于 HBase 测试，需要选择 <code>com.yahoo.ycsb.db.HBaseClient</code> 作为接口。</p>
+<p>另外 YCSB 需要知道如何连接到 HBase 的 Zookeeper 服务，最简单的方法是将目标测试服务器上的 HBase 配置文件 <code>$HBASE_HOME/conf/hbase-site.xml</code> 复制到 <code>$YCSB/hbase12/conf</code> 中（低版本 HBase 需要复制到对应的 <code>hbase10</code> 等文件夹中）。</p>
+<p>YCSB 也提供了一个 <code>com.yahoo.ycsb.BasicDB</code> 数据库接口层，这个接口层仅仅打印收到的数据库操作请求，可以用来调试。</p>
+<p>可以用 <code>bin/yscb shell &lt;interface&gt;</code> 来测试数据库接口层配置是否正确，例如使用 <code>BasicDB</code> 层：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">$ ./bin/ycsb shell basic</div><div class="line">&gt; <span class="built_in">help</span></div><div class="line">Commands:</div><div class="line">  <span class="built_in">read</span> key [field1 field2 ...] - Read a record</div><div class="line">  scan key recordcount [field1 field2 ...] - Scan starting at key</div><div class="line">  insert key name1=value1 [name2=value2 ...] - Insert a new record</div><div class="line">  update key name1=value1 [name2=value2 ...] - Update a record</div><div class="line">  delete key - Delete a record</div><div class="line">  table [tablename] - Get or [<span class="built_in">set</span>] the name of the table</div><div class="line">  quit - Quit</div></pre></td></tr></table></figure>
+<h4 id="第三步：选择合适的-workload"><a href="#第三步：选择合适的-workload" class="headerlink" title="第三步：选择合适的 workload"></a>第三步：选择合适的 workload</h4><p>Workload 定义了如何向数据库中加载测试数据，包括两个部分：</p>
+<ul>
+<li>Workload Java 类（<code>com.yahoo.ycsb.Workload</code> 的子类）</li>
+<li>配置文件（Java Properties 格式）</li>
+</ul>
+<p>YCSB 的 CoreWorkload 预置了一些标准测试数据，可以直接使用，包括 6 个不同的类型：</p>
+<ul>
+<li>Workload A：<ul>
+<li>重更新，50% 读 50% 写，例如 session sotre</li>
+</ul>
+</li>
+<li>Workload B：<ul>
+<li>读多写少，95% 读 5% 写，例如 photo tagging</li>
+</ul>
+</li>
+<li>Workload C：<ul>
+<li>只读：100% 读，例如 user profile cache</li>
+</ul>
+</li>
+<li>Workload D：<ul>
+<li>读最近更新：这个 workload 会插入新纪录，越新的纪录读取概率越大，例如：user status updates</li>
+</ul>
+</li>
+<li>Workload E：<ul>
+<li>小范围查询：这个 workload 会查询小范围的纪录，而不是单个纪录，例如：threaded conversations</li>
+</ul>
+</li>
+<li>Workload F：<ul>
+<li>读取-修改-写入：这个 workload 会读取一个纪录，然后修改这个纪录，最后写回，例如：user database</li>
+</ul>
+</li>
+</ul>
+<p>可以根据测试需求选择合适的 workload，也可以新建一个新的 workload。</p>
+<h4 id="第四步：选择合适的运行时参数"><a href="#第四步：选择合适的运行时参数" class="headerlink" title="第四步：选择合适的运行时参数"></a>第四步：选择合适的运行时参数</h4><p>除了在 workload 中配置参数外，YCSB 还支持这些运行时参数：</p>
+<ul>
+<li><code>-threads</code>：客户端线程数，默认为 1</li>
+<li><code>-target</code>：每秒的目标操作数，默认为无限制（尽可能快地完成操作）。例如一个操作需要 100 ms，那么一个线程 1s 内可以完成 10 个操作，通过 <code>-target</code> 参数可以将操作放缓，控制在 10 个以下</li>
+<li><code>-s</code>：每 10s 打印一次客户端状态，用于调试</li>
+</ul>
+<h4 id="第五步：装载数据"><a href="#第五步：装载数据" class="headerlink" title="第五步：装载数据"></a>第五步：装载数据</h4><p>Workload 包含两个阶段：装载阶段和事务阶段。在装载阶段向数据库中插入测试数据。对于 HBase 测试，可以使用下面的命令装载数据：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./bin/ycsb load hbase12 -P workloads/workloada -p table=usertable -p columnfamily=cf -p recordcount=100000000 -p operationcount=100000000 -thread 50 -s</div></pre></td></tr></table></figure>
+<p>各个参数的含义为：</p>
+<ul>
+<li><code>hbase12</code>：使用 HBase 1.2.x 版本的数据库连接层</li>
+<li><code>-P</code> 指定 workload 配置文件路径，使用 Workload A 类型</li>
+<li><code>-p</code> 指定单个配置（会覆盖之前文件中的配置）<ul>
+<li><code>table=</code>，<code>columnfamily=</code>, 指定 HBase 表名和列族</li>
+<li><code>recordcount=</code>，<code>operationcount=</code>，指定纪录数和操作数</li>
+</ul>
+</li>
+<li><code>-thread</code> 指定客户端线程数</li>
+<li><code>-s</code> 打印状态</li>
+</ul>
+<h4 id="第六步：运行测试"><a href="#第六步：运行测试" class="headerlink" title="第六步：运行测试"></a>第六步：运行测试</h4><p>当装载完测试数据后，就可以运行 workload 测试了。对于 HBase 测试命令为：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./bin/ycsb run hbase12 -P workloads/workloada -p table=usertable -p columnfamily=cf -p recordcount=100000000 -p operationcount=100000000 -thread 50 -s</div></pre></td></tr></table></figure>
+<p>参数含义与装载数据时相同，区别在用 <code>run</code> 替代了 <code>load</code>。</p>
+<p>运行结束后可以看到 YCSB 打印出了一些测试统计结果：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">[OVERALL], RunTime(ms), 11551.0</div><div class="line">[OVERALL], Throughput(ops/sec), 8657.259111765215</div><div class="line">[TOTAL_GCS_PS_Scavenge], Count, 12.0</div><div class="line">[TOTAL_GC_TIME_PS_Scavenge], Time(ms), 66.0</div><div class="line">[TOTAL_GC_TIME_%_PS_Scavenge], Time(%), 0.5713791013765043</div><div class="line">[TOTAL_GCS_PS_MarkSweep], Count, 0.0</div><div class="line">[TOTAL_GC_TIME_PS_MarkSweep], Time(ms), 0.0</div><div class="line">[TOTAL_GC_TIME_%_PS_MarkSweep], Time(%), 0.0</div><div class="line">[TOTAL_GCs], Count, 12.0</div><div class="line">[TOTAL_GC_TIME], Time(ms), 66.0</div><div class="line">[TOTAL_GC_TIME_%], Time(%), 0.5713791013765043</div><div class="line">[READ], Operations, 50011.0</div><div class="line">[READ], AverageLatency(us), 4418.49443122513</div><div class="line">[READ], MinLatency(us), 1584.0</div><div class="line">[READ], MaxLatency(us), 208895.0</div><div class="line">[READ], 95thPercentileLatency(us), 8207.0</div><div class="line">[READ], 99thPercentileLatency(us), 11463.0</div><div class="line">[READ], Return=OK, 50011</div><div class="line">[CLEANUP], Operations, 100.0</div><div class="line">[CLEANUP], AverageLatency(us), 1393.0</div><div class="line">[CLEANUP], MinLatency(us), 1.0</div><div class="line">[CLEANUP], MaxLatency(us), 138623.0</div><div class="line">[CLEANUP], 95thPercentileLatency(us), 18.0</div><div class="line">[CLEANUP], 99thPercentileLatency(us), 258.0</div><div class="line">[UPDATE], Operations, 49989.0</div><div class="line">[UPDATE], AverageLatency(us), 6124.871431714977</div><div class="line">[UPDATE], MinLatency(us), 1947.0</div><div class="line">[UPDATE], MaxLatency(us), 429311.0</div><div class="line">[UPDATE], 95thPercentileLatency(us), 10087.0</div><div class="line">[UPDATE], 99thPercentileLatency(us), 15335.0</div><div class="line">[UPDATE], Return=OK, 49989</div></pre></td></tr></table></figure>
+<p>各个参数的含义在结果解析中解释。</p>
+<p>如果想获得直方图或者时间序列结果（参考测量参数），可以使用 <code>measurementtype=timeseries</code> 参数。客户端默认每 1s 纪录一次平均延迟，可以通过 <code>timeseries.granularity=2000</code> 参数（毫秒）来修改。此时测试报告为：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">...</div><div class="line">[READ], 0, 12064.403652090341</div><div class="line">[READ], 1000, 6515.2218055956155</div><div class="line">[READ], 2000, 5907.763636363637</div><div class="line">[READ], 3000, 4967.781086610593</div><div class="line">[READ], 4000, 4397.277823577906</div><div class="line">[READ], 5000, 5179.516736401673</div><div class="line">[READ], 6000, 4398.908602150537</div><div class="line">[READ], 7000, 4493.980899323517</div><div class="line">[READ], 8000, 4431.4615697437985</div><div class="line">[READ], 9000, 4365.6925873560895</div><div class="line">[READ], 10000, 5771.521574205784</div><div class="line">[READ], 11000, 4300.872277227722</div><div class="line">[READ], 12000, 3728.5879396984924</div><div class="line">...</div></pre></td></tr></table></figure>
+<p>此时整个测试过程就结束了。</p>
+<p>注意 YCSB 的延迟为端到端的延迟，在开始调用数据库接口层方法前开始计时，在方法返回时结束计时，也就是说延迟包括这几个部分：</p>
+<ul>
+<li>在接口层内代码的运行时间</li>
+<li>客户端到数据库服务器的网络延迟</li>
+<li>数据库的执行时间</li>
+</ul>
+<p>其中并不包括由 <code>-target</code> 节流参数引入的延迟。</p>
+<h3 id="主要参数"><a href="#主要参数" class="headerlink" title="主要参数"></a>主要参数</h3><h4 id="YCSB-参数"><a href="#YCSB-参数" class="headerlink" title="YCSB 参数"></a>YCSB 参数</h4><p>所有的 workload 文件都可以使用以下参数：</p>
+<ul>
+<li><code>workload</code>：workload 类</li>
+<li><code>db</code>：数据库接口层类，默认为 <code>com.yahoo.ycsb.BasicDB</code>，也可以通过命令行指定</li>
+<li><code>exporter</code>：报告类，默认为 <code>com.yahoo.ycsb.measurements.exporter.TextMeasurementsExporter</code></li>
+<li><code>exportfile</code>：报告输出路径，默认 <code>stdout</code></li>
+<li><code>threadcount</code>：客户端线程数，默认 1</li>
+<li><code>measurementtype</code>：测量类型，支持 <code>histogram</code> 和 <code>timeseries</code>，默认 <code>histogram</code></li>
+</ul>
+<h4 id="预置-Core-workload-包参数"><a href="#预置-Core-workload-包参数" class="headerlink" title="预置 Core workload 包参数"></a>预置 Core workload 包参数</h4><p>预置的 workload 支持以下参数：</p>
+<ul>
+<li><code>fieldcount</code>：每个纪录中字段的个数，默认：10</li>
+<li><code>fieldlength</code>：每个字段的大小，默认：100</li>
+<li><code>readallfields</code>：是否读取所有字段还是一个字段，默认：true（读取所有字段）</li>
+<li><code>readproportion</code>：读取操作所占比例，默认 0.95</li>
+<li><code>updateproportion</code>：更新操作所占比例，默认 0.05</li>
+<li><code>insertproportion</code>：插入操作所占比例，默认 0</li>
+<li><code>scanproportion</code>：扫描操作所占比例，默认 0</li>
+<li><code>readmodifywriteproportion</code>：读-更新-写操作所占比例：默认 0</li>
+<li><code>requestdistribution</code>：请求的概率分布类型，支持 <code>uniform</code>、<code>zipfian</code>、<code>latest</code>，默认 <code>uniform</code><ul>
+<li><code>uniform</code>：均匀分布</li>
+<li><code>zipfian</code>：<a href="https://www.wikiwand.com/zh/%E9%BD%8A%E5%A4%AB%E5%AE%9A%E5%BE%8B" target="_blank" rel="external">齐夫分布</a></li>
+<li><code>latest</code>：数据越新访问概率越高</li>
+</ul>
+</li>
+<li><code>maxscanlength</code>：扫描操作最长的范围，默认 1000</li>
+<li><code>scanlengthdistribution</code>：扫描操作范围的概率分布类型（从 1 到 <code>scanlengthdistribution</code>），默认 <code>uniform</code></li>
+<li><code>insertorder</code>：插入顺序<ul>
+<li><code>ordered</code>：根据 key 排序插入</li>
+<li><code>hashed</code>：根据 hash 结果排序插入</li>
+</ul>
+</li>
+<li><code>operationcount</code>：操作数</li>
+<li><code>maxexecutiontime</code>：最长总体执行时间（秒）</li>
+<li><code>table</code>：数据库表名，默认 <code>usertable</code></li>
+<li><code>recordcount</code>：纪录数，默认 0</li>
+<li><code>core_workload_insertion_retry_limit</code>：插入失败重试次数，默认 0</li>
+<li><code>core_workload_insertion_retry_interval</code>：重试间隔（秒），默认 3</li>
+</ul>
+<h4 id="测量参数"><a href="#测量参数" class="headerlink" title="测量参数"></a>测量参数</h4><ul>
+<li><code>hdrhistogram</code> 生成 <code>hdrhistogram</code> 格式的报告，可以使用 <a href="http://hdrhistogram.github.io/HdrHistogram/plotFiles.html" target="_blank" rel="external">HdrHistogram Plotter</a> 展示图形结果<ul>
+<li><code>hdrhistogram.percentiles</code>：测量百分位分区，用逗号隔开，默认 95,99（参考<a href="https://www.zhihu.com/question/20575291" target="_blank" rel="external">第95个百分位（95th percentile）是什么概念？</a>）</li>
+<li><code>hdrhistogram.fileoutput=true|false</code>：是否输出到文件，文件地址由 <code>hdrhistogram.output.path</code> 指定</li>
+</ul>
+</li>
+<li><code>histogram</code><ul>
+<li><code>histogram.buckets</code>：直方图的分区数，默认 1000</li>
+</ul>
+</li>
+<li><code>timeseries</code><ul>
+<li><code>timeseries.granularity</code>：时间序列的粒度（毫秒），默认 1000</li>
+</ul>
+</li>
+</ul>
+<h3 id="结果解析"><a href="#结果解析" class="headerlink" title="结果解析"></a>结果解析</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[OVERALL], RunTime(ms), 16487.0</div><div class="line">[OVERALL], Throughput(ops/sec), 6065.384848668648</div></pre></td></tr></table></figure>
+<ul>
+<li><code>[OVERALL]</code> 区显示测试总体情况<ul>
+<li><code>RunTime(ms)</code> 运行总时间</li>
+<li><code>Throughput(ops/sec)</code> 吞吐量，每秒操作数</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">[TOTAL_GCS_PS_Scavenge], Count, 23.0</div><div class="line">[TOTAL_GC_TIME_PS_Scavenge], Time(ms), 88.0</div><div class="line">[TOTAL_GC_TIME_%_PS_Scavenge], Time(%), 0.5337538666828411</div><div class="line">[TOTAL_GCS_PS_MarkSweep], Count, 0.0</div><div class="line">[TOTAL_GC_TIME_PS_MarkSweep], Time(ms), 0.0</div><div class="line">[TOTAL_GC_TIME_%_PS_MarkSweep], Time(%), 0.0</div><div class="line">[TOTAL_GCs], Count, 23.0</div><div class="line">[TOTAL_GC_TIME], Time(ms), 88.0</div><div class="line">[TOTAL_GC_TIME_%], Time(%), 0.5337538666828411</div></pre></td></tr></table></figure>
+<ul>
+<li><code>[TOTAL_GC*]</code> 区显示垃圾回收情况（<a href="http://www.jdon.com/idea/jvm-gc.html" target="_blank" rel="external">JVM有关垃圾回收机制的配置</a>）<ul>
+<li><code>[TOTAL_GCS_PS_Scavenge], Count, 23.0</code> Parallel Scavenge 回收次数</li>
+<li><code>[TOTAL_GC_TIME_PS_Scavenge], Time(ms), 88.0</code> Parallel Scavenge 回收时间</li>
+<li><code>[TOTAL_GC_TIME_%_PS_Scavenge], Time(%), 0.5337538666828411</code> Parallel Scavenge 回收时间百分比</li>
+<li><code>[TOTAL_GCS_PS_MarkSweep], Count, 0.0</code> PS MarkSweep 回收次数</li>
+<li><code>[TOTAL_GC_TIME_PS_MarkSweep], Time(ms), 0.0</code> PS MarkSweep 回收时间</li>
+<li><code>[TOTAL_GC_TIME_%_PS_MarkSweep], Time(%), 0.0</code> PS MarkSweep 回收时间百分比</li>
+<li><code>[TOTAL_GCs], Count, 23.0</code> 全局 GC 次数</li>
+<li><code>[TOTAL_GC_TIME], Time(ms), 88.0</code> 全局 GC 时间</li>
+<li><code>[TOTAL_GC_TIME_%], Time(%), 0.5337538666828411</code> 全局 GC 时间百分比</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[READ], Operations, 50011.0</div><div class="line">[READ], AverageLatency(us), 4418.49443122513</div><div class="line">[READ], MinLatency(us), 1584.0</div><div class="line">[READ], MaxLatency(us), 208895.0</div><div class="line">[READ], 95thPercentileLatency(us), 8207.0</div><div class="line">[READ], 99thPercentileLatency(us), 11463.0</div><div class="line">[READ], Return=OK, 50011</div></pre></td></tr></table></figure>
+<ul>
+<li><code>[READ]</code> 区显示读取操作的统计结果<ul>
+<li><code>Operations</code> 总操作数</li>
+<li><code>AverageLatency(us)</code> 平均延迟（微秒）</li>
+<li><code>MinLatency(us)</code> 最小延迟</li>
+<li><code>MaxLatency(us)</code> 最大延迟</li>
+<li><code>95thPercentileLatency(us)</code> 第 95 百分位延迟（<a href="https://www.zhihu.com/question/20575291" target="_blank" rel="external">第95个百分位（95th percentile）是什么概念？</a>）</li>
+<li><code>99thPercentileLatency(us)</code> 第 99 百分位延迟</li>
+<li><code>Return=OK, 50011</code> 结果（正确），总操作数</li>
+</ul>
+</li>
+</ul>
+<p><code>[CLEANUP]</code>（清理操作）、<code>[UPDATE]</code>（更新操作）等等和 <code>[READ]</code> 区类似，不再介绍。</p>
+<h3 id="并行测试"><a href="#并行测试" class="headerlink" title="并行测试"></a>并行测试</h3><p>客户端默认会读取并操作所有的测试记录数据，在想多个客户端并行测试时这可能有些问题。可以用 <code>insertstart</code> 和 <code>insertcount</code> 两个参数来限制客户端操作测试纪录的范围，例如对于 4 个客户端测试 100000000 条纪录可以这样配置：</p>
+<p>第一个客户端：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">insertstart=0</div><div class="line">insertcount=25000000</div></pre></td></tr></table></figure>
+<p>第二个客户端：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">insertstart=25000000</div><div class="line">insertcount=25000000</div></pre></td></tr></table></figure>
+<p>第三个客户端：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">insertstart=50000000</div><div class="line">insertcount=25000000</div></pre></td></tr></table></figure>
+<p>第四个客户端：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">insertstart=75000000</div><div class="line">insertcount=25000000</div></pre></td></tr></table></figure></div></article></div></main><footer><div class="paginator"><a href="/es-managing-time-based-indices-efficiently/" class="prev">PREV</a><a href="/about-java-02/" class="next">NEXT</a></div><div class="copyright"><p>© 2015 - 2018 <a href="http://stormluke.me">stormluke</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>
