@@ -1,8 +1,7 @@
 menu:
     Blog: /
     Archive: /archives/
-    Weibo: http://weibo.com/sunchongsheng
-    GitHub: https://github.com/pinggod
+    GitHub: https://github.com/stormluke
     Rss: /atom.xml
 
 favicon: /favicon.png
@@ -10,12 +9,12 @@ logo: /favicon.png
 
 # Comment
 # e.g disqus: seansun
-disqus:
+disqus: stormluke-preferences
 duoshuo:
 
 # Analytics
 # google-analytics:
-# ga: UA-xxxxxxxx-x
+ga: UA-60486509-1
 
 # Copyright Infomation
-startyear: 2015
+startyear: 2012
