@@ -51,14 +51,14 @@
   </url>
   
   <url>
-    <loc>http://stormluke.me/the-501-developer-manifesto/</loc>
+    <loc>http://stormluke.me/the-little-schemer-4th-edition-ch9/</loc>
     
     <lastmod>2018-04-21T06:53:32.038Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://stormluke.me/the-little-schemer-4th-edition-ch9/</loc>
+    <loc>http://stormluke.me/the-501-developer-manifesto/</loc>
     
     <lastmod>2018-04-21T06:53:32.038Z</lastmod>
     
@@ -93,6 +93,13 @@
   </url>
   
   <url>
+    <loc>http://stormluke.me/reactive-programming-note-03/</loc>
+    
+    <lastmod>2018-04-21T06:53:32.036Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://stormluke.me/reactive-programming-note-04/</loc>
     
     <lastmod>2018-04-21T06:53:32.036Z</lastmod>
@@ -107,14 +114,7 @@
   </url>
   
   <url>
-    <loc>http://stormluke.me/reactive-programming-note-03/</loc>
-    
-    <lastmod>2018-04-21T06:53:32.036Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://stormluke.me/reactive-programming-note-01/</loc>
+    <loc>http://stormluke.me/rake-conflicts-with-zsh/</loc>
     
     <lastmod>2018-04-21T06:53:32.036Z</lastmod>
     
@@ -128,7 +128,7 @@
   </url>
   
   <url>
-    <loc>http://stormluke.me/rake-conflicts-with-zsh/</loc>
+    <loc>http://stormluke.me/reactive-programming-note-01/</loc>
     
     <lastmod>2018-04-21T06:53:32.036Z</lastmod>
     
@@ -142,7 +142,7 @@
   </url>
   
   <url>
-    <loc>http://stormluke.me/my-first-telephone-interview/</loc>
+    <loc>http://stormluke.me/merry-xmas/</loc>
     
     <lastmod>2018-04-21T06:53:32.035Z</lastmod>
     
@@ -156,28 +156,14 @@
   </url>
   
   <url>
-    <loc>http://stormluke.me/merry-xmas/</loc>
+    <loc>http://stormluke.me/my-first-telephone-interview/</loc>
     
     <lastmod>2018-04-21T06:53:32.035Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://stormluke.me/functional-programming-note-12/</loc>
-    
-    <lastmod>2018-04-21T06:53:32.034Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://stormluke.me/functional-programming-note-10/</loc>
-    
-    <lastmod>2018-04-21T06:53:32.034Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://stormluke.me/functional-programming-note-09/</loc>
+    <loc>http://stormluke.me/functional-programming-note-07/</loc>
     
     <lastmod>2018-04-21T06:53:32.034Z</lastmod>
     
@@ -191,7 +177,14 @@
   </url>
   
   <url>
-    <loc>http://stormluke.me/functional-programming-note-07/</loc>
+    <loc>http://stormluke.me/functional-programming-note-09/</loc>
+    
+    <lastmod>2018-04-21T06:53:32.034Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://stormluke.me/functional-programming-note-10/</loc>
     
     <lastmod>2018-04-21T06:53:32.034Z</lastmod>
     
@@ -205,16 +198,16 @@
   </url>
   
   <url>
-    <loc>http://stormluke.me/hello/</loc>
+    <loc>http://stormluke.me/functional-programming-note-12/</loc>
     
     <lastmod>2018-04-21T06:53:32.034Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://stormluke.me/functional-programming-note-05/</loc>
+    <loc>http://stormluke.me/hello/</loc>
     
-    <lastmod>2018-04-21T06:53:32.033Z</lastmod>
+    <lastmod>2018-04-21T06:53:32.034Z</lastmod>
     
   </url>
   
@@ -233,13 +226,6 @@
   </url>
   
   <url>
-    <loc>http://stormluke.me/functional-programming-note-06/</loc>
-    
-    <lastmod>2018-04-21T06:53:32.033Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://stormluke.me/functional-programming-note-02/</loc>
     
     <lastmod>2018-04-21T06:53:32.033Z</lastmod>
@@ -247,9 +233,16 @@
   </url>
   
   <url>
-    <loc>http://stormluke.me/functional-programming-note-01/</loc>
+    <loc>http://stormluke.me/functional-programming-note-05/</loc>
     
-    <lastmod>2018-04-21T06:53:32.032Z</lastmod>
+    <lastmod>2018-04-21T06:53:32.033Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://stormluke.me/functional-programming-note-06/</loc>
+    
+    <lastmod>2018-04-21T06:53:32.033Z</lastmod>
     
   </url>
   
@@ -268,7 +261,7 @@
   </url>
   
   <url>
-    <loc>http://stormluke.me/about-java-02/</loc>
+    <loc>http://stormluke.me/functional-programming-note-01/</loc>
     
     <lastmod>2018-04-21T06:53:32.032Z</lastmod>
     
@@ -276,6 +269,13 @@
   
   <url>
     <loc>http://stormluke.me/book-list-2016/</loc>
+    
+    <lastmod>2018-04-21T06:53:32.032Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://stormluke.me/about-java-02/</loc>
     
     <lastmod>2018-04-21T06:53:32.032Z</lastmod>
     
