@@ -10,6 +10,8 @@ url: how-to-debug-front-end-optimising-network-assets
 
 网络性能可以决定 web app 的成败。最初 app 很新很小时，很少有开发者会持续关注 app 到底用了多长时间发送了多少兆字节给用户。
 
+<!-- more -->
+
 如果你从未测量过自己 app 的性能，那很可能会有一些改进余地。问题是，你需要改善多少才能让用户注意到。
 
 在下面的研究中，你可以找到有关多长的加载时间差异可以被人们明显地感受到的信息。如果你想让用户注意到你的努力，那就要超过 20% 这个门槛。[阅读更多](https://www.smashingmagazine.com/2015/09/why-performance-matters-the-perception-of-time/#the-need-for-performance-optimization-the-20-rule)
