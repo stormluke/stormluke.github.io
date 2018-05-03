@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://stormluke.me/es-modules-a-cartoon-deep-dive/</loc>
+    
+    <lastmod>2018-05-03T01:53:52.607Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://stormluke.me/how-to-debug-front-end-optimising-network-assets/</loc>
     
     <lastmod>2018-04-24T01:10:12.311Z</lastmod>
@@ -37,14 +44,14 @@
   </url>
   
   <url>
-    <loc>http://stormluke.me/ycsb-hbase-readme/</loc>
+    <loc>http://stormluke.me/wwdc-2016-session-419-note/</loc>
     
     <lastmod>2018-04-21T06:53:32.040Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://stormluke.me/wwdc-2016-session-419-note/</loc>
+    <loc>http://stormluke.me/ycsb-hbase-readme/</loc>
     
     <lastmod>2018-04-21T06:53:32.040Z</lastmod>
     
@@ -58,6 +65,13 @@
   </url>
   
   <url>
+    <loc>http://stormluke.me/todos-2015/</loc>
+    
+    <lastmod>2018-04-21T06:53:32.039Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://stormluke.me/why-meteor-rocks/</loc>
     
     <lastmod>2018-04-21T06:53:32.039Z</lastmod>
@@ -66,13 +80,6 @@
   
   <url>
     <loc>http://stormluke.me/trampoline-in-javascript/</loc>
-    
-    <lastmod>2018-04-21T06:53:32.039Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://stormluke.me/todos-2015/</loc>
     
     <lastmod>2018-04-21T06:53:32.039Z</lastmod>
     
@@ -100,20 +107,6 @@
   </url>
   
   <url>
-    <loc>http://stormluke.me/reactive-programming-note-05/</loc>
-    
-    <lastmod>2018-04-21T06:53:32.037Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://stormluke.me/reactive-programming-note-08/</loc>
-    
-    <lastmod>2018-04-21T06:53:32.037Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://stormluke.me/reactive-programming-note-06/</loc>
     
     <lastmod>2018-04-21T06:53:32.037Z</lastmod>
@@ -128,7 +121,21 @@
   </url>
   
   <url>
-    <loc>http://stormluke.me/reactive-cocoa-readme/</loc>
+    <loc>http://stormluke.me/reactive-programming-note-08/</loc>
+    
+    <lastmod>2018-04-21T06:53:32.037Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://stormluke.me/reactive-programming-note-05/</loc>
+    
+    <lastmod>2018-04-21T06:53:32.037Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://stormluke.me/reactive-programming-note-04/</loc>
     
     <lastmod>2018-04-21T06:53:32.036Z</lastmod>
     
@@ -142,14 +149,14 @@
   </url>
   
   <url>
-    <loc>http://stormluke.me/reactive-programming-note-04/</loc>
+    <loc>http://stormluke.me/reactive-cocoa-readme/</loc>
     
     <lastmod>2018-04-21T06:53:32.036Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://stormluke.me/rake-conflicts-with-zsh/</loc>
+    <loc>http://stormluke.me/reactive-programming-note-03/</loc>
     
     <lastmod>2018-04-21T06:53:32.036Z</lastmod>
     
@@ -163,9 +170,16 @@
   </url>
   
   <url>
-    <loc>http://stormluke.me/reactive-programming-note-03/</loc>
+    <loc>http://stormluke.me/rake-conflicts-with-zsh/</loc>
     
     <lastmod>2018-04-21T06:53:32.036Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://stormluke.me/my-anime-list/</loc>
+    
+    <lastmod>2018-04-21T06:53:32.035Z</lastmod>
     
   </url>
   
@@ -184,13 +198,6 @@
   </url>
   
   <url>
-    <loc>http://stormluke.me/my-anime-list/</loc>
-    
-    <lastmod>2018-04-21T06:53:32.035Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://stormluke.me/my-first-telephone-interview/</loc>
     
     <lastmod>2018-04-21T06:53:32.035Z</lastmod>
@@ -198,7 +205,21 @@
   </url>
   
   <url>
-    <loc>http://stormluke.me/functional-programming-note-09/</loc>
+    <loc>http://stormluke.me/functional-programming-note-11/</loc>
+    
+    <lastmod>2018-04-21T06:53:32.034Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://stormluke.me/hello/</loc>
+    
+    <lastmod>2018-04-21T06:53:32.034Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://stormluke.me/functional-programming-note-07/</loc>
     
     <lastmod>2018-04-21T06:53:32.034Z</lastmod>
     
@@ -212,7 +233,7 @@
   </url>
   
   <url>
-    <loc>http://stormluke.me/functional-programming-note-11/</loc>
+    <loc>http://stormluke.me/functional-programming-note-09/</loc>
     
     <lastmod>2018-04-21T06:53:32.034Z</lastmod>
     
@@ -233,35 +254,7 @@
   </url>
   
   <url>
-    <loc>http://stormluke.me/functional-programming-note-07/</loc>
-    
-    <lastmod>2018-04-21T06:53:32.034Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://stormluke.me/hello/</loc>
-    
-    <lastmod>2018-04-21T06:53:32.034Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://stormluke.me/functional-programming-note-04/</loc>
-    
-    <lastmod>2018-04-21T06:53:32.033Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://stormluke.me/functional-programming-note-05/</loc>
-    
-    <lastmod>2018-04-21T06:53:32.033Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://stormluke.me/functional-programming-note-02/</loc>
     
     <lastmod>2018-04-21T06:53:32.033Z</lastmod>
     
@@ -275,7 +268,21 @@
   </url>
   
   <url>
+    <loc>http://stormluke.me/functional-programming-note-02/</loc>
+    
+    <lastmod>2018-04-21T06:53:32.033Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://stormluke.me/functional-programming-note-06/</loc>
+    
+    <lastmod>2018-04-21T06:53:32.033Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://stormluke.me/functional-programming-note-04/</loc>
     
     <lastmod>2018-04-21T06:53:32.033Z</lastmod>
     
@@ -289,14 +296,14 @@
   </url>
   
   <url>
-    <loc>http://stormluke.me/fix-blanket-theme/</loc>
+    <loc>http://stormluke.me/functional-programming-note-01/</loc>
     
     <lastmod>2018-04-21T06:53:32.032Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://stormluke.me/functional-programming-note-01/</loc>
+    <loc>http://stormluke.me/fix-blanket-theme/</loc>
     
     <lastmod>2018-04-21T06:53:32.032Z</lastmod>
     
